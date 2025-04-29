@@ -1,49 +1,67 @@
 import '../models/user.dart';
 import '../controllers/database_helper.dart';
 
+/// Repository class for managing User data in the database.
+///
+/// This class provides methods for CRUD operations on User objects.
 class UserRepository {
-  final dbHelper = DatabaseHelper.instance;
+  final DatabaseHelper _dbHelper = DatabaseHelper.instance;
 
-  Future<int> insert(User user) async {
-    final db = await dbHelper.database;
-    await db.insert('users', user.toMap());
-    return 1;
-  }
-
-  Future<User?> getUser(String id) async {
-    final db = await dbHelper.database;
-    final maps = await db.query(
-      'users',
-      where: 'user_id = ?',
-      whereArgs: [id],
-    );
-
-    if (maps.isEmpty) return null;
-    return User.fromMap(maps.first);
-  }
-
+  /// Retrieves all users from the database.
+  ///
+  /// Returns:
+  ///   List(User): A list of all users in the database.
   Future<List<User>> getAllUsers() async {
-    final db = await dbHelper.database;
-    final maps = await db.query('users');
-    return maps.map((map) => User.fromMap(map)).toList();
+    final users = await _dbHelper.getAllUsers();
+    return users.map((map) => User.fromMap(map)).toList();
   }
 
-  Future<int> update(User user) async {
-    final db = await dbHelper.database;
-    return await db.update(
-      'users',
-      user.toMap(),
-      where: 'user_id = ?',
-      whereArgs: [user.userId],
+  /// Retrieves a specific user by their ID.
+  ///
+  /// Args:
+  ///   userId (String): The unique identifier of the user to retrieve.
+  ///
+  /// Returns:
+  ///   User?: The user if found, null otherwise.
+  Future<User?> getUserById(String userId) async {
+    final users = await _dbHelper.getAllUsers();
+    final userMap = users.firstWhere(
+      (map) => map['user_id'] == userId,
+      orElse: () => {},
     );
+    return userMap.isEmpty ? null : User.fromMap(userMap);
   }
 
-  Future<int> delete(String id) async {
-    final db = await dbHelper.database;
-    return await db.delete(
-      'users',
-      where: 'user_id = ?',
-      whereArgs: [id],
-    );
+  /// Adds a new user to the database.
+  ///
+  /// Args:
+  ///   user (User): The user object to add to the database.
+  ///
+  /// Returns:
+  ///   void
+  Future<void> addUser(User user) async {
+    await _dbHelper.addUser(user.toMap());
+  }
+
+  /// Updates an existing user in the database.
+  ///
+  /// Args:
+  ///   user (User): The updated user object.
+  ///
+  /// Returns:
+  ///   void
+  Future<void> updateUser(User user) async {
+    await _dbHelper.updateUserStats(user.userId, user.toMap());
+  }
+
+  /// Deletes a user and all associated data from the database.
+  ///
+  /// Args:
+  ///   userId (String): The unique identifier of the user to delete.
+  ///
+  /// Returns:
+  ///   void
+  Future<void> deleteUser(String userId) async {
+    await _dbHelper.deleteUser(userId);
   }
 }
