@@ -4,27 +4,34 @@ import 'package:flutter/material.dart';
 Widget buildLineChart(
   int totalDays,
   List<int> viewsPerDay,
-  String X_axis_heading,
-  String Y_axis_heading,
-  String Graph_heading,
-  double chartHeight, // Added chartHeight parameter
+  List<String> dates,
+  String xAxisHeading,
+  String yAxisHeading,
+  String graphHeading,
+  double chartHeight,
 ) {
   List<FlSpot> spots = [];
   double maxY = 0;
 
   for (int i = 0; i < totalDays && i < viewsPerDay.length; i++) {
     double y = viewsPerDay[i].toDouble();
-    spots.add(FlSpot((i + 1).toDouble(), y));
+    spots.add(FlSpot(i.toDouble(), y));
     if (y > maxY) maxY = y;
   }
 
-  int maxXLabels = 6;
-  int xInterval = (totalDays / maxXLabels).ceil();
   double yInterval = (maxY / 5).ceilToDouble();
 
+  // Ensure valid label indexes (start, middle, end)
+  List<int> labelIndexes = [];
+  if (dates.length >= 3) {
+    labelIndexes = [0, (dates.length - 1) ~/ 2, dates.length - 1];
+  } else {
+    labelIndexes = List.generate(dates.length, (index) => index);
+  }
+
   return Container(
-    width: double.infinity, // Make the container width responsive
-    padding: const EdgeInsets.all(12),
+    width: double.infinity,
+    padding: const EdgeInsets.fromLTRB(12, 12, 35, 12),
     decoration: const BoxDecoration(
       color: Color.fromARGB(255, 241, 241, 241),
       borderRadius: BorderRadius.all(Radius.circular(12)),
@@ -46,7 +53,7 @@ Widget buildLineChart(
         Padding(
           padding: const EdgeInsets.only(left: 30),
           child: Text(
-            Graph_heading,
+            graphHeading,
             style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
           ),
         ),
@@ -57,29 +64,38 @@ Widget buildLineChart(
             height: chartHeight - 40,
             child: LineChart(
               LineChartData(
-                minX: 0.5,
-                maxX: totalDays.toDouble() + 0.5,
+                minX: 0,
+                maxX: totalDays.toDouble() - 1,
                 minY: 0,
                 maxY: maxY + yInterval,
                 backgroundColor: Colors.white,
                 clipData: FlClipData.all(),
                 titlesData: FlTitlesData(
-                  topTitles: AxisTitles(
-                    sideTitles: SideTitles(showTitles: false),
-                  ),
-                  rightTitles: AxisTitles(
-                    sideTitles: SideTitles(showTitles: false),
-                  ),
+                  topTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                  rightTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
                   bottomTitles: AxisTitles(
                     sideTitles: SideTitles(
                       showTitles: true,
-                      reservedSize: 28,
-                      interval: xInterval.toDouble(),
+                      reservedSize: 36,
+                      interval: 1,
                       getTitlesWidget: (value, meta) {
-                        if (value % xInterval == 0 && value <= totalDays + 0.5) {
-                          return Text(
-                            '${value.toInt()}',
-                            style: const TextStyle(fontSize: 10),
+                        int index = value.round();
+                        if (labelIndexes.contains(index) && index < dates.length) {
+                          return SideTitleWidget(
+                            axisSide: meta.axisSide,
+                            space: 8,
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(horizontal: 12), // <- Added padding
+                              child: SizedBox(
+                                width: 60,
+                                child: Text(
+                                  dates[index],
+                                  style: const TextStyle(fontSize: 10),
+                                  textAlign: TextAlign.center,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ),
+                            ),
                           );
                         }
                         return const SizedBox.shrink();
@@ -89,11 +105,11 @@ Widget buildLineChart(
                   leftTitles: AxisTitles(
                     sideTitles: SideTitles(
                       showTitles: true,
-                      reservedSize: 36,
+                      reservedSize: 40,
                       interval: yInterval,
                       getTitlesWidget: (value, meta) {
                         return Padding(
-                          padding: const EdgeInsets.only(right: 2),
+                          padding: const EdgeInsets.only(right: 4),
                           child: Text(
                             '${value.toInt()}',
                             style: const TextStyle(fontSize: 10),
@@ -105,7 +121,10 @@ Widget buildLineChart(
                 ),
                 borderData: FlBorderData(
                   show: true,
-                  border: const Border(left: BorderSide(), bottom: BorderSide()),
+                  border: const Border(
+                    left: BorderSide(),
+                    bottom: BorderSide(),
+                  ),
                 ),
                 gridData: FlGridData(show: false),
                 lineBarsData: [
@@ -124,14 +143,17 @@ Widget buildLineChart(
                     tooltipBgColor: Colors.black87,
                     getTooltipItems: (touchedSpots) {
                       return touchedSpots.map((spot) {
+                        int index = spot.x.round();
+                        String date = (index >= 0 && index < dates.length)
+                            ? dates[index]
+                            : 'N/A';
                         return LineTooltipItem(
-                          '$X_axis_heading: ${spot.x.toInt()}\n$Y_axis_heading: ${spot.y.toInt()}',
+                          '$xAxisHeading: $date\n$yAxisHeading: ${spot.y.toInt()}',
                           const TextStyle(color: Colors.white, fontSize: 12),
                         );
                       }).toList();
                     },
                   ),
-                  handleBuiltInTouches: true,
                 ),
               ),
             ),

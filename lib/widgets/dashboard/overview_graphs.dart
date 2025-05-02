@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'dart:math';
+import '../../screens/content_screen.dart'; // import ContentScreen
+import 'package:intl/intl.dart';
 
 import 'line_graph.dart';
 
@@ -8,12 +10,35 @@ List<int> generateRandomList(int numberOfValues, int max) {
   return List<int>.generate(numberOfValues, (_) => random.nextInt(max + 1));
 }
 
+List<String> generateRandomDates(int n) {
+  final Random random = Random();
+  final DateFormat formatter = DateFormat('yyyy-MM-dd');
+
+  // Pick a random starting date within the past 90 days
+  final DateTime now = DateTime.now();
+  final int daysAgo = random.nextInt(90);
+  DateTime startDate = now.subtract(Duration(days: daysAgo));
+
+  // Generate sequential dates
+  List<String> sequentialDates = List.generate(n, (i) {
+    DateTime date = startDate.add(Duration(days: i));
+    return formatter.format(date);
+  });
+
+  return sequentialDates;
+}
+
 Widget overview_graphs(BuildContext context) {
-  int totalDays = 40;
+  int totalDays = 30;
   List<int> views1 = generateRandomList(totalDays, 5000);
   List<int> views2 = generateRandomList(totalDays, 134);
   List<int> views3 = generateRandomList(totalDays, 500);
   List<int> views4 = generateRandomList(totalDays, 90);
+
+  List<String>  dates1 = generateRandomDates(totalDays);
+  List<String>  dates2 = generateRandomDates(totalDays);
+  List<String>  dates3 = generateRandomDates(totalDays);
+  List<String>  dates4 = generateRandomDates(totalDays);
 
   double chartHeight = MediaQuery.of(context).size.height > 600 ? 300 : 200;
 
@@ -24,9 +49,9 @@ Widget overview_graphs(BuildContext context) {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            buildLineChart(totalDays, views1, "Day", "Views", "Views", chartHeight),
+            buildLineChart(totalDays, views1,dates1, "Date", "Views", "Views", chartHeight),
             const SizedBox(height: 24),
-            buildLineChart(totalDays, views3, "Day", "Wt (hrs)", "Watch Time", chartHeight),
+            buildLineChart(totalDays, views3, dates2, "Date", "Wt (hrs)", "Watch Time", chartHeight),
           ],
         ),
       ),
@@ -35,9 +60,9 @@ Widget overview_graphs(BuildContext context) {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            buildLineChart(totalDays, views2, "Day", "Subscribers", "Subscribers", chartHeight),
+            buildLineChart(totalDays, views2, dates3, "Date", "Subscribers", "Subscribers", chartHeight),
             const SizedBox(height: 24),
-            buildLineChart(totalDays, views4, "Day", "\$ Earned", "Estimated Revenue", chartHeight),
+            buildLineChart(totalDays, views4, dates4, "Date", "\$ Earned", "Estimated Revenue", chartHeight),
           ],
         ),
       ),
@@ -45,9 +70,13 @@ Widget overview_graphs(BuildContext context) {
   );
 }
 
-// This widget now handles internal state for hover
+// Updated TopVideosWidget with dynamic parameters
 class TopVideosWidget extends StatefulWidget {
-  const TopVideosWidget({super.key});
+  final String channelName;
+  final String channelDescription;
+  final String profileImageUrl;
+
+  const TopVideosWidget(this.channelName, this.channelDescription, this.profileImageUrl, {super.key});
 
   @override
   State<TopVideosWidget> createState() => _TopVideosWidgetState();
@@ -57,7 +86,19 @@ class _TopVideosWidgetState extends State<TopVideosWidget> {
   bool isHovered = false;
 
   void onTopVideosTap() {
-    print("This is suppose to take user to the content page.");
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(
+        builder: (context) => ContentScreen(
+          channelName: widget.channelName,
+          channelDescription: widget.channelDescription,
+          profileImageUrl: widget.profileImageUrl,
+          onProfileUpdate: (name, desc, url) {
+            // handle the update if needed
+          },
+        ),
+      ),
+    );
   }
 
   @override
@@ -176,28 +217,28 @@ class _TopVideosWidgetState extends State<TopVideosWidget> {
   }
 }
 
-Widget over_view_widget() {
+Widget over_view_widget(String _channelName, String _channelDescription, String _profileImageUrl) {
   return LayoutBuilder(
     builder: (context, constraints) {
       bool isWideScreen = constraints.maxWidth > 800;
 
       return SingleChildScrollView(
         child: Padding(
-          padding: const EdgeInsets.all(16.0),
+          padding: const EdgeInsets.only(top: 16.0, right: 16.0, bottom: 16.0), // Removed left padding
           child: isWideScreen
               ? Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Expanded(child: overview_graphs(context)),
                     const SizedBox(width: 32),
-                    const Expanded(child: TopVideosWidget()),
+                    Expanded(child: TopVideosWidget(_channelName, _channelDescription, _profileImageUrl)),
                   ],
                 )
               : Column(
                   children: [
                     overview_graphs(context),
                     const SizedBox(height: 32),
-                    const TopVideosWidget(),
+                    TopVideosWidget(_channelName, _channelDescription, _profileImageUrl),
                   ],
                 ),
         ),

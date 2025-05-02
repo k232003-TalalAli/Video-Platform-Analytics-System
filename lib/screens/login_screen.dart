@@ -111,11 +111,11 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     // Cozy, warm color scheme
-    final Color primaryColor = const Color(0xFF8D5524); // Warm brown
-    final Color accentColor =
-        const Color(0xFFFFA07A); // Light salmon (warm accent)
-    final Color bgColor = const Color(0xFFF6E3C5); // Cozy warm tan background
-    final Color cardColor = const Color(0xFFFFE0B2); // Light terracotta card
+    const Color primaryColor = Color(0xFF8D5524); // Warm brown
+    const Color accentColor =
+        Color(0xFFFFA07A); // Light salmon (warm accent)
+    const Color bgColor = Color(0xFFF6E3C5); // Cozy warm tan background
+    const Color cardColor = Color(0xFFFFE0B2); // Light terracotta card
 
     return Scaffold(
       backgroundColor: bgColor,

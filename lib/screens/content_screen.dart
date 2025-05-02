@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../widgets/custom_app_bar.dart';
 import '../widgets/custom_drawer.dart';
+import '../widgets/content/video_list_widget.dart';
 
 class ContentScreen extends StatefulWidget {
   final String channelName;
@@ -63,12 +64,7 @@ class _ContentScreenState extends State<ContentScreen> {
         onProfileUpdate: _handleProfileUpdate,
       ),
       drawerEdgeDragWidth: 0,
-      body: Center(
-        child: Text(
-          'Content Page',
-          style: Theme.of(context).textTheme.headlineMedium,
-        ),
-      ),
+      body: video_list_widget(),
     );
   }
 } 

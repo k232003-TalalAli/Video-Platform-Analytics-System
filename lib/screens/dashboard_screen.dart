@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import '../widgets/profile_picture.dart';
-import '../widgets/analytics_card.dart';
-import '../widgets/overview_graphs.dart';
+import '../widgets/dashboard/analytics_card.dart';
+import '../widgets/dashboard/overview_graphs.dart';
 import '../widgets/custom_app_bar.dart';
 import '../widgets/custom_drawer.dart';
 
@@ -147,7 +147,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
               },
             ),
             const SizedBox(height: 32),
-            over_view_widget(),
+            over_view_widget( _channelName, _channelDescription, _profileImageUrl),
           ],
         ),
       ),
