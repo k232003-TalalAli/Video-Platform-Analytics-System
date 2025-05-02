@@ -11,7 +11,7 @@ class DashboardScreen extends StatefulWidget {
   final String? initialProfileImageUrl;
 
   const DashboardScreen({
-    super.key, 
+    super.key,
     this.initialChannelName,
     this.initialChannelDescription,
     this.initialProfileImageUrl,
@@ -32,7 +32,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
   void initState() {
     super.initState();
     _channelName = widget.initialChannelName ?? 'My Channel';
-    _channelDescription = widget.initialChannelDescription ?? 'Welcome to my YouTube channel!';
+    _channelDescription =
+        widget.initialChannelDescription ?? 'Welcome to my YouTube channel!';
     _profileImageUrl = widget.initialProfileImageUrl ?? '';
   }
 

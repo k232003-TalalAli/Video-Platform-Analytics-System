@@ -1,20 +1,16 @@
 import 'package:flutter/material.dart';
 import 'dart:io'; // For checking platform
-import 'package:window_size/window_size.dart'; // For setting window size to max upon first start
-import 'screens/dashboard_screen.dart';
+import 'package:window_size/window_size.dart';
+import 'screens/login_screen.dart';
 
-void main() {
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   if (Platform.isWindows || Platform.isLinux || Platform.isMacOS) {
-    setWindowMaxSize(Size.infinite); // Allow window to be maximized to any size
-    setWindowMinSize(const Size(800, 600)); // Optional: Set a minimum size
-    getCurrentScreen().then((screen) {
-      if (screen != null) {
-        final screenFrame = screen.visibleFrame;
-        setWindowFrame(screenFrame); // Maximize the window to screen size
-      }
-    });
+    setWindowTitle('Login');
+    setWindowMinSize(const Size(500, 600));
+    setWindowMaxSize(const Size(500, 750));
+    setWindowFrame(const Rect.fromLTWH(100, 100, 500, 650));
   }
 
   runApp(const YouTubeStudio());
@@ -78,7 +74,7 @@ class YouTubeStudio extends StatelessWidget {
           waitDuration: Duration(days: 1),
         ),
       ),
-      home: const DashboardScreen(),
+      home: const LoginScreen(),
     );
   }
 }
