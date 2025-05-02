@@ -155,7 +155,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
       ),
       actions: [
         IconButton(
-          icon: const Icon(Icons.help_outline),
+          icon: const Icon(Icons.info),
           onPressed: () => _showHelpDialog(context),
           tooltip: '',
         ),

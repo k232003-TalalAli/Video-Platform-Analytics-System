@@ -111,6 +111,8 @@ class _TopVideosWidgetState extends State<TopVideosWidget> {
     const baseColor = Color.fromARGB(255, 241, 241, 241);
     final hoverColor = baseColor.withOpacity(0.94);
 
+    //HARDCODED VALUES --------------------------------------------------------------------------------------------------
+
     List<String> imgPaths = [
       "imgs/thumbnail_1.jpg",
       "imgs/thumbnail_2.jpg",
@@ -137,6 +139,12 @@ class _TopVideosWidgetState extends State<TopVideosWidget> {
       "2025-04-10",
       "2025-04-05",
     ];
+
+    
+    String comments_subs_rev_HARDCODED="100";
+    String Watch_time="100 hrs";
+
+      //HARDCODED VALUES END --------------------------------------------------------------------------------------------------
 
     List<Widget> imgWidgets = [];
 
@@ -173,10 +181,59 @@ class _TopVideosWidgetState extends State<TopVideosWidget> {
                       style: TextStyle(fontSize: nameFontSize, fontWeight: FontWeight.bold),
                     ),
                     const SizedBox(height: 4),
-                    Text(
-                      imgDates[i],
-                      style: TextStyle(fontSize: dateFontSize, color: Colors.grey),
-                    ),
+                    Row(
+                            children: [
+                              Icon(Icons.date_range, size: 16, color: Colors.grey[600]),
+                              SizedBox(width: 6),
+                              Text(
+                                imgDates[i],
+                                style: TextStyle(
+                                  fontSize: dateFontSize,
+                                  color: Colors.grey[600],
+                                ),
+                              ),
+                              SizedBox(width: 30), // More horizontal space
+                              Icon(Icons.comment, size: 16, color: Colors.grey[600]),
+                              SizedBox(width: 6),
+                              Text(
+                                comments_subs_rev_HARDCODED,
+                                style: TextStyle(
+                                  fontSize: dateFontSize,
+                                  color: Colors.grey[600],
+                                ),
+                              ),
+                              SizedBox(width: 30),
+                              Icon(Icons.people, size: 16, color: Colors.grey[600]),
+                              SizedBox(width: 6),
+                              Text(
+                               comments_subs_rev_HARDCODED,
+                                style: TextStyle(
+                                  fontSize: dateFontSize,
+                                  color: Colors.grey[600],
+                                ),
+                              ),
+                              SizedBox(width: 30),
+                              Icon(Icons.attach_money, size: 16, color: Colors.grey[600]),
+                              SizedBox(width: 6),
+                              Text(
+                              comments_subs_rev_HARDCODED,
+                                style: TextStyle(
+                                  fontSize: dateFontSize,
+                                  color: Colors.grey[600],
+                                ),
+                              ),
+                              SizedBox(width: 30),
+                              Icon(Icons.access_time, size: 16, color: Colors.grey[600]),
+                              SizedBox(width: 6),
+                              Text(
+                                Watch_time,
+                                style: TextStyle(
+                                  fontSize: dateFontSize,
+                                  color: Colors.grey[600],
+                                ),
+                              ),
+                            ],
+                          ),
                   ],
                 ),
               ),

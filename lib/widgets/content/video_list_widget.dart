@@ -27,6 +27,9 @@ List<String> generateRandomDates(int n) {
 }
 
 Widget video_statistics_graphs(BuildContext context) {
+
+        //HARDCODED VALUES  --------------------------------------------------------------------------------------------------
+
   int totalDays = 30;
   List<int> views1 = generateRandomList(totalDays, 5000);
   List<int> views2 = generateRandomList(totalDays, 134);
@@ -37,6 +40,8 @@ Widget video_statistics_graphs(BuildContext context) {
   List<String>  dates2 = generateRandomDates(totalDays);
   List<String>  dates3 = generateRandomDates(totalDays);
   List<String>  dates4 = generateRandomDates(totalDays);
+
+        //HARDCODED VALUES END --------------------------------------------------------------------------------------------------
 
   double chartHeight = MediaQuery.of(context).size.height > 600 ? 300 : 200;
 
@@ -97,7 +102,6 @@ class _video_list_widgetState extends State<video_list_widget> {
   List<int> clickedIndexes = []; // Track the indexes where videos are clicked
 
   void onVideoTap(BuildContext context, int index, String videoName) {
-    print("Video clicked: $videoName");
 
     setState(() {
       if (clickedIndexes.contains(index)) {
@@ -148,13 +152,15 @@ class _video_list_widgetState extends State<video_list_widget> {
         final clickedColor = baseColor.withOpacity(0.7); // Increased opacity for more noticeable click effect
         final hoverColor = baseColor.withOpacity(0.94);
 
+              //HARDCODED VALUES --------------------------------------------------------------------------------------------------
+
         List<String> imgPaths = [
           "imgs/thumbnail_1.jpg",
           "imgs/thumbnail_2.jpg",
           "imgs/thumbnail_3.jpg",
           "imgs/thumbnail_4.jpg",
           "imgs/thumbnail_3.jpg",
-          "imgs/thumbnail_4.jpg"
+
         ];
 
         List<String> imgNames = [
@@ -163,7 +169,6 @@ class _video_list_widgetState extends State<video_list_widget> {
           "this is a placeholder. only here to simulate, replace this with actual names",
           "ala larkey, mja aagya lmaoooo",
           "this is a placeholder. only here to simulate, replace this with actual video names",
-          "bro this sum gud shit",
         ];
 
         List<String> imgDates = [
@@ -172,8 +177,12 @@ class _video_list_widgetState extends State<video_list_widget> {
           "2025-04-10",
           "2025-05-10",
           "2025-04-10",
-          "2025-04-05",
         ];
+
+        String comments_subs_rev_HARDCODED="100"; //this is supposed to be an array, im just displaying the same thing, so using just 1 variable for all
+        String Watch_time="100 hrs";  //this is supposed to be an array, im just displaying the same thing, so using just 1 variable for all
+
+              //HARDCODED VALUES END --------------------------------------------------------------------------------------------------
 
         List<Widget> imgWidgets = [];
 
@@ -221,13 +230,59 @@ class _video_list_widgetState extends State<video_list_widget> {
                               color: Colors.black87,
                             ),
                           ),
-                          const SizedBox(height: 4),
-                          Text(
-                            imgDates[i],
-                            style: TextStyle(
-                              fontSize: dateFontSize,
-                              color: Colors.grey[600],
-                            ),
+                          const SizedBox(height: 30),
+                          Row(
+                            children: [
+                              Icon(Icons.date_range, size: 16, color: Colors.grey[600]),
+                              SizedBox(width: 6),
+                              Text(
+                                imgDates[i],
+                                style: TextStyle(
+                                  fontSize: dateFontSize,
+                                  color: Colors.grey[600],
+                                ),
+                              ),
+                              SizedBox(width: 30), // More horizontal space
+                              Icon(Icons.comment, size: 16, color: Colors.grey[600]),
+                              SizedBox(width: 6),
+                              Text(
+                                comments_subs_rev_HARDCODED,
+                                style: TextStyle(
+                                  fontSize: dateFontSize,
+                                  color: Colors.grey[600],
+                                ),
+                              ),
+                              SizedBox(width: 30),
+                              Icon(Icons.people, size: 16, color: Colors.grey[600]),
+                              SizedBox(width: 6),
+                              Text(
+                               comments_subs_rev_HARDCODED,
+                                style: TextStyle(
+                                  fontSize: dateFontSize,
+                                  color: Colors.grey[600],
+                                ),
+                              ),
+                              SizedBox(width: 30),
+                              Icon(Icons.attach_money, size: 16, color: Colors.grey[600]),
+                              SizedBox(width: 6),
+                              Text(
+                              comments_subs_rev_HARDCODED,
+                                style: TextStyle(
+                                  fontSize: dateFontSize,
+                                  color: Colors.grey[600],
+                                ),
+                              ),
+                              SizedBox(width: 30),
+                              Icon(Icons.access_time, size: 16, color: Colors.grey[600]),
+                              SizedBox(width: 6),
+                              Text(
+                                Watch_time,
+                                style: TextStyle(
+                                  fontSize: dateFontSize,
+                                  color: Colors.grey[600],
+                                ),
+                              ),
+                            ],
                           ),
                         ],
                       ),
