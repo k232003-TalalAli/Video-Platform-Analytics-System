@@ -197,7 +197,6 @@ class _ProfileSettingsDialogState extends State<ProfileSettingsDialog> {
                       _nameController.text,
                       _descriptionController.text,
                     );
-                    Navigator.pop(context);
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.black,
