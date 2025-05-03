@@ -179,8 +179,9 @@ class _video_list_widgetState extends State<video_list_widget> {
           "2025-04-10",
         ];
 
-        String comments_subs_rev_HARDCODED="100"; //this is supposed to be an array, im just displaying the same thing, so using just 1 variable for all
+        String comments_rev_HARDCODED="100"; //this is supposed to be an array, im just displaying the same thing, so using just 1 variable for all
         String Watch_time="100 hrs";  //this is supposed to be an array, im just displaying the same thing, so using just 1 variable for all
+        String Views="120K";
 
               //HARDCODED VALUES END --------------------------------------------------------------------------------------------------
 
@@ -243,20 +244,20 @@ class _video_list_widgetState extends State<video_list_widget> {
                                 ),
                               ),
                               SizedBox(width: 30), // More horizontal space
-                              Icon(Icons.comment, size: 16, color: Colors.grey[600]),
+                              Icon(Icons.visibility, size: 16, color: Colors.grey[600]),
                               SizedBox(width: 6),
                               Text(
-                                comments_subs_rev_HARDCODED,
+                                Views,
                                 style: TextStyle(
                                   fontSize: dateFontSize,
                                   color: Colors.grey[600],
                                 ),
                               ),
                               SizedBox(width: 30),
-                              Icon(Icons.people, size: 16, color: Colors.grey[600]),
+                              Icon(Icons.comment, size: 16, color: Colors.grey[600]),
                               SizedBox(width: 6),
                               Text(
-                               comments_subs_rev_HARDCODED,
+                               comments_rev_HARDCODED,
                                 style: TextStyle(
                                   fontSize: dateFontSize,
                                   color: Colors.grey[600],
@@ -266,7 +267,7 @@ class _video_list_widgetState extends State<video_list_widget> {
                               Icon(Icons.attach_money, size: 16, color: Colors.grey[600]),
                               SizedBox(width: 6),
                               Text(
-                              comments_subs_rev_HARDCODED,
+                              comments_rev_HARDCODED,
                                 style: TextStyle(
                                   fontSize: dateFontSize,
                                   color: Colors.grey[600],

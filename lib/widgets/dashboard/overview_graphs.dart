@@ -141,8 +141,9 @@ class _TopVideosWidgetState extends State<TopVideosWidget> {
     ];
 
     
-    String comments_subs_rev_HARDCODED="100";
+    String comments_rev_HARDCODED="100";
     String Watch_time="100 hrs";
+    String Views="120K";
 
       //HARDCODED VALUES END --------------------------------------------------------------------------------------------------
 
@@ -193,20 +194,20 @@ class _TopVideosWidgetState extends State<TopVideosWidget> {
                                 ),
                               ),
                               SizedBox(width: 30), // More horizontal space
-                              Icon(Icons.comment, size: 16, color: Colors.grey[600]),
+                              Icon(Icons.visibility, size: 16, color: Colors.grey[600]),
                               SizedBox(width: 6),
                               Text(
-                                comments_subs_rev_HARDCODED,
+                                Views,
                                 style: TextStyle(
                                   fontSize: dateFontSize,
                                   color: Colors.grey[600],
                                 ),
                               ),
                               SizedBox(width: 30),
-                              Icon(Icons.people, size: 16, color: Colors.grey[600]),
+                              Icon(Icons.comment, size: 16, color: Colors.grey[600]),
                               SizedBox(width: 6),
                               Text(
-                               comments_subs_rev_HARDCODED,
+                               comments_rev_HARDCODED,
                                 style: TextStyle(
                                   fontSize: dateFontSize,
                                   color: Colors.grey[600],
@@ -216,7 +217,7 @@ class _TopVideosWidgetState extends State<TopVideosWidget> {
                               Icon(Icons.attach_money, size: 16, color: Colors.grey[600]),
                               SizedBox(width: 6),
                               Text(
-                              comments_subs_rev_HARDCODED,
+                              comments_rev_HARDCODED,
                                 style: TextStyle(
                                   fontSize: dateFontSize,
                                   color: Colors.grey[600],
