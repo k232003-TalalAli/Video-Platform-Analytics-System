@@ -7,6 +7,7 @@ class ContentScreen extends StatefulWidget {
   final String channelName;
   final String channelDescription;
   final String profileImageUrl;
+  final String userId;
   final Function(String, String, String) onProfileUpdate;
 
   const ContentScreen({
@@ -14,6 +15,7 @@ class ContentScreen extends StatefulWidget {
     required this.channelName,
     required this.channelDescription,
     required this.profileImageUrl,
+    required this.userId,
     required this.onProfileUpdate,
   }) : super(key: key);
 
@@ -64,7 +66,7 @@ class _ContentScreenState extends State<ContentScreen> {
         onProfileUpdate: _handleProfileUpdate,
       ),
       drawerEdgeDragWidth: 0,
-      body: video_list_widget(),
+      body: VideoListWidget(userId: widget.userId),
     );
   }
 } 

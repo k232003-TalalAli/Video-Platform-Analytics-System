@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'dart:math';
 import '../../screens/content_screen.dart'; // import ContentScreen
 import 'package:intl/intl.dart';
+import '../../login/user_session.dart';
 
 import 'line_graph.dart';
 
@@ -75,8 +76,14 @@ class TopVideosWidget extends StatefulWidget {
   final String channelName;
   final String channelDescription;
   final String profileImageUrl;
+  final String? userId;
 
-  const TopVideosWidget(this.channelName, this.channelDescription, this.profileImageUrl, {super.key});
+  const TopVideosWidget(
+    this.channelName, 
+    this.channelDescription, 
+    this.profileImageUrl, 
+    {super.key, this.userId}
+  );
 
   @override
   State<TopVideosWidget> createState() => _TopVideosWidgetState();
@@ -84,6 +91,13 @@ class TopVideosWidget extends StatefulWidget {
 
 class _TopVideosWidgetState extends State<TopVideosWidget> {
   bool isHovered = false;
+  late String _userId;
+
+  @override
+  void initState() {
+    super.initState();
+    _userId = widget.userId ?? UserSession().currentUserId ?? 'b4fc101f-a404-49e3-a7f7-4f83bc0e38e8';
+  }
 
   void onTopVideosTap() {
     Navigator.pushReplacement(
@@ -93,6 +107,7 @@ class _TopVideosWidgetState extends State<TopVideosWidget> {
           channelName: widget.channelName,
           channelDescription: widget.channelDescription,
           profileImageUrl: widget.profileImageUrl,
+          userId: _userId,
           onProfileUpdate: (name, desc, url) {
             // handle the update if needed
           },
@@ -275,7 +290,7 @@ class _TopVideosWidgetState extends State<TopVideosWidget> {
   }
 }
 
-Widget over_view_widget(String _channelName, String _channelDescription, String _profileImageUrl) {
+Widget over_view_widget(String _channelName, String _channelDescription, String _profileImageUrl, {String? userId}) {
   return LayoutBuilder(
     builder: (context, constraints) {
       bool isWideScreen = constraints.maxWidth > 800;
@@ -289,14 +304,14 @@ Widget over_view_widget(String _channelName, String _channelDescription, String 
                   children: [
                     Expanded(child: overview_graphs(context)),
                     const SizedBox(width: 32),
-                    Expanded(child: TopVideosWidget(_channelName, _channelDescription, _profileImageUrl)),
+                    Expanded(child: TopVideosWidget(_channelName, _channelDescription, _profileImageUrl, userId: userId)),
                   ],
                 )
               : Column(
                   children: [
                     overview_graphs(context),
                     const SizedBox(height: 32),
-                    TopVideosWidget(_channelName, _channelDescription, _profileImageUrl),
+                    TopVideosWidget(_channelName, _channelDescription, _profileImageUrl, userId: userId),
                   ],
                 ),
         ),

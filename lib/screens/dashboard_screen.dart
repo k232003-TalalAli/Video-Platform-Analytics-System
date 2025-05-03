@@ -4,6 +4,7 @@ import '../widgets/dashboard/analytics_card.dart';
 import '../widgets/dashboard/overview_graphs.dart';
 import '../widgets/custom_app_bar.dart';
 import '../widgets/custom_drawer.dart';
+import '../login/user_session.dart';
 
 class DashboardScreen extends StatefulWidget {
   final String? initialChannelName;
@@ -27,6 +28,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
   late String _channelDescription;
   late String _profileImageUrl;
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+  String _userId = '';
 
   @override
   void initState() {
@@ -35,6 +37,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
     _channelDescription =
         widget.initialChannelDescription ?? 'Welcome to my YouTube channel!';
     _profileImageUrl = widget.initialProfileImageUrl ?? '';
+    _userId = UserSession().currentUserId ?? '';
   }
 
   @override
@@ -61,6 +64,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
         channelDescription: _channelDescription,
         profileImageUrl: _profileImageUrl,
         selectedIndex: _selectedIndex,
+        userId: _userId,
         onProfileUpdate: (name, description, imageUrl) {
           if (!mounted) return;
           setState(() {
@@ -147,7 +151,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
               },
             ),
             const SizedBox(height: 32),
-            over_view_widget( _channelName, _channelDescription, _profileImageUrl),
+            over_view_widget(_channelName, _channelDescription, _profileImageUrl, userId: _userId),
           ],
         ),
       ),

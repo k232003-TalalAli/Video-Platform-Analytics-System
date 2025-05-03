@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import '../login/login_database_helper.dart';
 import '../DB/repositories/user_repository.dart';
 import '../DB/models/user.dart';
+import '../login/user_session.dart';
 import 'package:uuid/uuid.dart';
 import 'dart:io';
 import 'package:window_size/window_size.dart';
@@ -41,6 +42,15 @@ class _LoginScreenState extends State<LoginScreen> {
       _errorMessage = valid ? null : 'Invalid username or password';
     });
     if (valid) {
+      // Find user ID for the logged in user
+      final userId = await UserSession().getUserIdFromUsername(username);
+      if (userId != null) {
+        // Set the current user in the session
+        UserSession().setCurrentUser(userId, username);
+      } else {
+        print('Warning: Could not find user ID for username: $username');
+      }
+
       // Expand window for main app on desktop
       if (Platform.isWindows || Platform.isLinux || Platform.isMacOS) {
         setWindowMinSize(const Size(1200, 800));

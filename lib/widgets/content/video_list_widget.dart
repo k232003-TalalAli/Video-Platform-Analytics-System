@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'dart:math';
 import 'package:intl/intl.dart';
 import '../dashboard/line_graph.dart';
+import '../../DB/controllers/database_helper.dart';
 
 List<int> generateRandomList(int numberOfValues, int max) {
   final random = Random();
@@ -26,10 +27,7 @@ List<String> generateRandomDates(int n) {
   return sequentialDates;
 }
 
-Widget video_statistics_graphs(BuildContext context) {
-
-        //HARDCODED VALUES  --------------------------------------------------------------------------------------------------
-
+Widget videoStatisticsGraphs(BuildContext context) {
   int totalDays = 30;
   List<int> views1 = generateRandomList(totalDays, 5000);
   List<int> views2 = generateRandomList(totalDays, 134);
@@ -41,8 +39,6 @@ Widget video_statistics_graphs(BuildContext context) {
   List<String>  dates3 = generateRandomDates(totalDays);
   List<String>  dates4 = generateRandomDates(totalDays);
 
-        //HARDCODED VALUES END --------------------------------------------------------------------------------------------------
-
   double chartHeight = MediaQuery.of(context).size.height > 600 ? 300 : 200;
 
   return Padding(
@@ -51,12 +47,12 @@ Widget video_statistics_graphs(BuildContext context) {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.black, width: 2),  // Changed to black and increased border width
-        boxShadow: [
+        border: Border.all(color: Colors.black, width: 2),
+        boxShadow: const [
           BoxShadow(
-            color: Colors.grey.withOpacity(0.2),
+            color: Color.fromRGBO(128, 128, 128, 0.2),
             blurRadius: 8,
-            offset: Offset(0, 4),
+            offset: const Offset(0, 4),
           ),
         ],
       ),
@@ -90,19 +86,168 @@ Widget video_statistics_graphs(BuildContext context) {
   );
 }
 
-class video_list_widget extends StatefulWidget {
-  const video_list_widget({super.key});
+class VideoListWidget extends StatefulWidget {
+  final String? userId;
+  
+  const VideoListWidget({
+    super.key,
+    this.userId,
+  });
 
   @override
-  State<video_list_widget> createState() => _video_list_widgetState();
+  State<VideoListWidget> createState() => _VideoListWidgetState();
 }
 
-class _video_list_widgetState extends State<video_list_widget> {
-  bool isHovered = false;
+enum SortCriteria {
+  views,
+  revenue,
+  watchtime,
+  subscribers,
+  date
+}
+
+class VideoData {
+  final String videoId;
+  final String videoName;
+  final int views;
+  final int subscribers;
+  final double revenue;
+  final int comments;
+  final int watchtime;
+  final String creationDate;
+  final String thumbnailPath;
+
+  VideoData({
+    required this.videoId,
+    required this.videoName,
+    required this.views,
+    required this.subscribers,
+    required this.revenue,
+    required this.comments,
+    required this.watchtime,
+    required this.creationDate,
+    this.thumbnailPath = "imgs/thumbnail_1.jpg", // Default thumbnail
+  });
+}
+
+class _VideoListWidgetState extends State<VideoListWidget> {
   List<int> clickedIndexes = []; // Track the indexes where videos are clicked
+  List<VideoData> videos = [];
+  bool isLoading = true;
+  String currentUserId = '';
+  String errorMessage = '';
+  SortCriteria currentSortCriteria = SortCriteria.views;
+  bool ascending = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadUserData();
+  }
+
+  Future<void> _loadUserData() async {
+    setState(() {
+      isLoading = true;
+      errorMessage = '';
+    });
+
+    try {
+      if (widget.userId != null && widget.userId!.isNotEmpty) {
+        // Use the userId passed from the ContentScreen
+        currentUserId = widget.userId!;
+        await _loadVideos(currentUserId);
+      } else {
+        // Fallback to the first user if none is provided
+        final allUsers = await DatabaseHelper.instance.getAllUsers();
+        if (allUsers.isEmpty) {
+          setState(() {
+            errorMessage = 'No users found in the database';
+            isLoading = false;
+          });
+          return;
+        }
+        
+        currentUserId = allUsers.first['user_id'] as String;
+        await _loadVideos(currentUserId);
+      }
+    } catch (e) {
+      setState(() {
+        errorMessage = 'Error loading user data: $e';
+        isLoading = false;
+      });
+    }
+  }
+
+  Future<void> _loadVideos(String userId) async {
+    try {
+      final userVideos = await DatabaseHelper.instance.getUserVideos(userId);
+      
+      // Convert database data to VideoData objects
+      List<VideoData> loadedVideos = userVideos.map((video) {
+        return VideoData(
+          videoId: video['video_id'] as String,
+          videoName: video['video_name'] as String,
+          views: video['views'] as int,
+          subscribers: video['subs'] as int,
+          revenue: video['revenue'] as double,
+          comments: video['comments'] as int,
+          watchtime: video['watchtime'] as int,
+          creationDate: video['creation_date'] as String,
+          // Randomly select one of the available thumbnails for demonstration
+          thumbnailPath: "imgs/thumbnail_${Random().nextInt(4) + 1}.jpg",
+        );
+      }).toList();
+
+      // Sort initially by views (descending)
+      _sortVideos(loadedVideos, SortCriteria.views, false);
+
+      setState(() {
+        videos = loadedVideos;
+        isLoading = false;
+      });
+    } catch (e) {
+      setState(() {
+        errorMessage = 'Error loading videos: $e';
+        isLoading = false;
+      });
+    }
+  }
+
+  void _sortVideos(List<VideoData> videoList, SortCriteria criteria, bool asc) {
+    switch (criteria) {
+      case SortCriteria.views:
+        videoList.sort((a, b) => asc ? a.views.compareTo(b.views) : b.views.compareTo(a.views));
+        break;
+      case SortCriteria.revenue:
+        videoList.sort((a, b) => asc ? a.revenue.compareTo(b.revenue) : b.revenue.compareTo(a.revenue));
+        break;
+      case SortCriteria.watchtime:
+        videoList.sort((a, b) => asc ? a.watchtime.compareTo(b.watchtime) : b.watchtime.compareTo(a.watchtime));
+        break;
+      case SortCriteria.subscribers:
+        videoList.sort((a, b) => asc ? a.subscribers.compareTo(b.subscribers) : b.subscribers.compareTo(a.subscribers));
+        break;
+      case SortCriteria.date:
+        videoList.sort((a, b) => asc ? a.creationDate.compareTo(b.creationDate) : b.creationDate.compareTo(a.creationDate));
+        break;
+    }
+  }
+
+  void onSortChanged(SortCriteria criteria) {
+    setState(() {
+      // If selecting the same criteria again, toggle the sort direction
+      if (currentSortCriteria == criteria) {
+        ascending = !ascending;
+      } else {
+        // New criteria selected, default to descending (false)
+        currentSortCriteria = criteria;
+        ascending = false;
+      }
+      _sortVideos(videos, currentSortCriteria, ascending);
+    });
+  }
 
   void onVideoTap(BuildContext context, int index, String videoName) {
-
     setState(() {
       if (clickedIndexes.contains(index)) {
         // If the video was clicked again, remove it from the list
@@ -112,6 +257,170 @@ class _video_list_widgetState extends State<video_list_widget> {
         clickedIndexes.add(index);
       }
     });
+  }
+
+  String _formatNumber(int number) {
+    if (number >= 1000000) {
+      return '${(number / 1000000).toStringAsFixed(1)}M';
+    } else if (number >= 1000) {
+      return '${(number / 1000).toStringAsFixed(1)}K';
+    }
+    return number.toString();
+  }
+
+  String _formatWatchTime(int seconds) {
+    int hours = seconds ~/ 3600;
+    return '$hours hrs';
+  }
+
+  Widget _buildSortButton(SortCriteria criteria, String text, IconData icon) {
+    final bool isSelected = currentSortCriteria == criteria;
+    
+    return StatefulBuilder(
+      builder: (context, setState) {
+        bool isHovering = false;
+        bool isPressed = false;
+        
+        return MouseRegion(
+          onEnter: (_) => setState(() => isHovering = true),
+          onExit: (_) => setState(() => isHovering = false),
+          cursor: SystemMouseCursors.click,
+          child: GestureDetector(
+            onTap: () => onSortChanged(criteria),
+            onTapDown: (_) => setState(() => isPressed = true),
+            onTapUp: (_) => setState(() => isPressed = false),
+            onTapCancel: () => setState(() => isPressed = false),
+            child: Transform.scale(
+              scale: isPressed ? 0.97 : 1.0,
+              child: AnimatedContainer(
+                duration: const Duration(milliseconds: 150),
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                decoration: BoxDecoration(
+                  color: isSelected ? Colors.black : (isHovering ? Colors.grey.shade100 : Colors.white),
+                  borderRadius: BorderRadius.circular(24),
+                  border: Border.all(
+                    color: isHovering ? Colors.grey.shade400 : Colors.grey.shade300
+                  ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Color.fromRGBO(0, 0, 0, isPressed ? 0.02 : 0.05),
+                      spreadRadius: isPressed ? 0 : 1,
+                      blurRadius: isPressed ? 1 : 2,
+                      offset: Offset(0, isPressed ? 0 : 1),
+                    ),
+                  ],
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(
+                      icon, 
+                      size: 18, 
+                      color: isSelected ? Colors.white : Colors.grey.shade700,
+                    ),
+                    const SizedBox(width: 6),
+                    Text(
+                      text,
+                      style: TextStyle(
+                        color: isSelected ? Colors.white : Colors.grey.shade700,
+                        fontWeight: isHovering || isSelected ? FontWeight.w600 : FontWeight.w500,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        );
+      }
+    );
+  }
+
+  Widget _buildSortMenu() {
+    return Container(
+      margin: const EdgeInsets.symmetric(vertical: 16.0, horizontal: 8.0),
+      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
+      child: Row(
+        children: [
+          const Text(
+            'Sort by:',
+            style: TextStyle(
+              fontWeight: FontWeight.w600,
+              color: Colors.black,
+              fontSize: 16,
+            ),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: Row(
+                children: [
+                  _buildSortButton(SortCriteria.views, 'Views', Icons.visibility),
+                  const SizedBox(width: 8),
+                  _buildSortButton(SortCriteria.subscribers, 'Subscribers', Icons.people),
+                  const SizedBox(width: 8),
+                  _buildSortButton(SortCriteria.watchtime, 'Watch Time', Icons.access_time),
+                  const SizedBox(width: 8),
+                  _buildSortButton(SortCriteria.revenue, 'Revenue', Icons.attach_money),
+                ],
+              ),
+            ),
+          ),
+          const SizedBox(width: 12),
+          StatefulBuilder(
+            builder: (context, setState) {
+              bool isHovering = false;
+              bool isPressed = false;
+              
+              return MouseRegion(
+                onEnter: (_) => setState(() => isHovering = true),
+                onExit: (_) => setState(() => isHovering = false),
+                cursor: SystemMouseCursors.click,
+                child: GestureDetector(
+                  onTap: () {
+                    this.setState(() {
+                      ascending = !ascending;
+                      _sortVideos(videos, currentSortCriteria, ascending);
+                    });
+                  },
+                  onTapDown: (_) => setState(() => isPressed = true),
+                  onTapUp: (_) => setState(() => isPressed = false),
+                  onTapCancel: () => setState(() => isPressed = false),
+                  child: Transform.scale(
+                    scale: isPressed ? 0.95 : 1.0,
+                    child: AnimatedContainer(
+                      duration: const Duration(milliseconds: 150),
+                      padding: const EdgeInsets.all(10),
+                      decoration: BoxDecoration(
+                        color: isHovering ? Colors.grey.shade100 : Colors.white,
+                        shape: BoxShape.circle,
+                        border: Border.all(
+                          color: isHovering ? Colors.grey.shade400 : Colors.grey.shade300
+                        ),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Color.fromRGBO(0, 0, 0, isPressed ? 0.02 : 0.05),
+                            spreadRadius: isPressed ? 0 : 1,
+                            blurRadius: isPressed ? 1 : 2,
+                            offset: Offset(0, isPressed ? 0 : 1),
+                          ),
+                        ],
+                      ),
+                      child: Icon(
+                        ascending ? Icons.arrow_upward : Icons.arrow_downward,
+                        size: 20,
+                        color: Colors.black,
+                      ),
+                    ),
+                  ),
+                ),
+              );
+            }
+          ),
+        ],
+      ),
+    );
   }
 
   @override
@@ -148,64 +457,45 @@ class _video_list_widgetState extends State<video_list_widget> {
             ? const EdgeInsets.all(10)
             : const EdgeInsets.symmetric(horizontal: 8, vertical: 6);
 
-        const baseColor = Color.fromARGB(255, 241, 241, 241);
-        final clickedColor = baseColor.withOpacity(0.7); // Increased opacity for more noticeable click effect
-        final hoverColor = baseColor.withOpacity(0.94);
+        const baseColor = Colors.white;
+        final clickedColor = const Color.fromARGB(255, 245, 245, 245);
 
-              //HARDCODED VALUES --------------------------------------------------------------------------------------------------
+        if (isLoading) {
+          return const Center(child: CircularProgressIndicator());
+        }
 
-        List<String> imgPaths = [
-          "imgs/thumbnail_1.jpg",
-          "imgs/thumbnail_2.jpg",
-          "imgs/thumbnail_3.jpg",
-          "imgs/thumbnail_4.jpg",
-          "imgs/thumbnail_3.jpg",
+        if (errorMessage.isNotEmpty) {
+          return Center(child: Text(errorMessage, style: const TextStyle(color: Colors.red)));
+        }
 
+        if (videos.isEmpty) {
+          return const Center(child: Text('No videos found for this user'));
+        }
+
+        List<Widget> contentWidgets = [
+          _buildSortMenu(),
         ];
 
-        List<String> imgNames = [
-          "this is a placeholder. only here to simulate",
-          "bro this sum gud shit",
-          "this is a placeholder. only here to simulate, replace this with actual names",
-          "ala larkey, mja aagya lmaoooo",
-          "this is a placeholder. only here to simulate, replace this with actual video names",
-        ];
-
-        List<String> imgDates = [
-          "2025-04-01",
-          "2025-04-05",
-          "2025-04-10",
-          "2025-05-10",
-          "2025-04-10",
-        ];
-
-        String comments_rev_HARDCODED="100"; //this is supposed to be an array, im just displaying the same thing, so using just 1 variable for all
-        String Watch_time="100 hrs";  //this is supposed to be an array, im just displaying the same thing, so using just 1 variable for all
-        String Views="120K";
-
-              //HARDCODED VALUES END --------------------------------------------------------------------------------------------------
-
-        List<Widget> imgWidgets = [];
-
-        for (int i = 0; i < imgPaths.length; i++) {
-          imgWidgets.add(
+        for (int i = 0; i < videos.length; i++) {
+          final video = videos[i];
+          contentWidgets.add(
             GestureDetector(
               onTap: () {
-                onVideoTap(context, i, imgNames[i]);
+                onVideoTap(context, i, video.videoName);
               },
               child: AnimatedContainer(
-                duration: Duration(milliseconds: 300), // Smooth transition on click
+                duration: const Duration(milliseconds: 300),
                 margin: EdgeInsets.symmetric(vertical: spacing / 2),
                 padding: videoPadding,
                 decoration: BoxDecoration(
-                  color: clickedIndexes.contains(i) ? clickedColor : Colors.white, // More noticeable click effect
-                  border: Border.all(color: const Color.fromARGB(255, 0, 0, 0), width: 2),
+                  color: clickedIndexes.contains(i) ? clickedColor : Colors.white,
+                  border: Border.all(color: const Color.fromRGBO(0, 0, 0, 0.1), width: 1),
                   borderRadius: BorderRadius.circular(borderRadius),
-                  boxShadow: [
+                  boxShadow: const [
                     BoxShadow(
-                      color: Colors.grey.withOpacity(0.08),
-                      blurRadius: 3,
-                      offset: const Offset(0, 1.5),
+                      color: Color.fromRGBO(0, 0, 0, 0.05),
+                      blurRadius: 5,
+                      offset: const Offset(0, 2),
                     ),
                   ],
                 ),
@@ -213,10 +503,18 @@ class _video_list_widgetState extends State<video_list_widget> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Image.asset(
-                      imgPaths[i],
+                      video.thumbnailPath,
                       fit: BoxFit.cover,
                       height: imageHeight,
                       width: imageHeight * 1.6,
+                      errorBuilder: (context, error, stackTrace) {
+                        return Container(
+                          height: imageHeight,
+                          width: imageHeight * 1.6,
+                          color: Colors.grey,
+                          child: const Icon(Icons.video_library, color: Colors.white),
+                        );
+                      },
                     ),
                     SizedBox(width: spacing),
                     Expanded(
@@ -224,7 +522,7 @@ class _video_list_widgetState extends State<video_list_widget> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            imgNames[i],
+                            video.videoName,
                             style: TextStyle(
                               fontSize: nameFontSize,
                               fontWeight: FontWeight.bold,
@@ -234,50 +532,50 @@ class _video_list_widgetState extends State<video_list_widget> {
                           const SizedBox(height: 30),
                           Row(
                             children: [
-                              Icon(Icons.date_range, size: 16, color: Colors.grey[600]),
-                              SizedBox(width: 6),
+                              const Icon(Icons.date_range, size: 16, color: Colors.grey),
+                              const SizedBox(width: 6),
                               Text(
-                                imgDates[i],
+                                DateFormat('yyyy-MM-dd').format(DateTime.parse(video.creationDate)),
                                 style: TextStyle(
                                   fontSize: dateFontSize,
                                   color: Colors.grey[600],
                                 ),
                               ),
-                              SizedBox(width: 30), // More horizontal space
-                              Icon(Icons.visibility, size: 16, color: Colors.grey[600]),
-                              SizedBox(width: 6),
+                              const SizedBox(width: 30),
+                              const Icon(Icons.visibility, size: 16, color: Colors.grey),
+                              const SizedBox(width: 6),
                               Text(
-                                Views,
+                                _formatNumber(video.views),
                                 style: TextStyle(
                                   fontSize: dateFontSize,
                                   color: Colors.grey[600],
                                 ),
                               ),
-                              SizedBox(width: 30),
+                              const SizedBox(width: 30),
                               Icon(Icons.comment, size: 16, color: Colors.grey[600]),
-                              SizedBox(width: 6),
+                              const SizedBox(width: 6),
                               Text(
-                               comments_rev_HARDCODED,
+                                _formatNumber(video.comments),
                                 style: TextStyle(
                                   fontSize: dateFontSize,
                                   color: Colors.grey[600],
                                 ),
                               ),
-                              SizedBox(width: 30),
+                              const SizedBox(width: 30),
                               Icon(Icons.attach_money, size: 16, color: Colors.grey[600]),
-                              SizedBox(width: 6),
+                              const SizedBox(width: 6),
                               Text(
-                              comments_rev_HARDCODED,
+                                '\$${video.revenue.toStringAsFixed(2)}',
                                 style: TextStyle(
                                   fontSize: dateFontSize,
                                   color: Colors.grey[600],
                                 ),
                               ),
-                              SizedBox(width: 30),
+                              const SizedBox(width: 30),
                               Icon(Icons.access_time, size: 16, color: Colors.grey[600]),
-                              SizedBox(width: 6),
+                              const SizedBox(width: 6),
                               Text(
-                                Watch_time,
+                                _formatWatchTime(video.watchtime),
                                 style: TextStyle(
                                   fontSize: dateFontSize,
                                   color: Colors.grey[600],
@@ -294,18 +592,18 @@ class _video_list_widgetState extends State<video_list_widget> {
             ),
           );
 
-          // If the current video is clicked, add the video_statistics_graphs widget below it
+          // If the current video is clicked, add the videoStatisticsGraphs widget below it
           if (clickedIndexes.contains(i)) {
-            imgWidgets.add(
+            contentWidgets.add(
               Padding(
-                padding: const EdgeInsets.only(top: 16.0, bottom: 16.0), // Padding between video and graph
+                padding: const EdgeInsets.only(top: 16.0, bottom: 16.0),
                 child: Center(
-                  child: Container(
-                    width: screenWidth / 2, // Half the screen width
+                  child: SizedBox(
+                    width: screenWidth / 2,
                     child: AnimatedOpacity(
-                      duration: Duration(milliseconds: 800), // Smoother fade-in for overview widget
-                      opacity: clickedIndexes.contains(i) ? 1.0 : 0.0, // Fade in when clicked
-                      child: video_statistics_graphs(context),
+                      duration: const Duration(milliseconds: 800),
+                      opacity: clickedIndexes.contains(i) ? 1.0 : 0.0,
+                      child: videoStatisticsGraphs(context),
                     ),
                   ),
                 ),
@@ -314,21 +612,24 @@ class _video_list_widgetState extends State<video_list_widget> {
           }
         }
 
-        return MouseRegion(
-          onEnter: (_) => setState(() => isHovered = true),
-          onExit: (_) => setState(() => isHovered = false),
-          child: Container(
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              color: isHovered ? hoverColor : baseColor,
-              borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: Colors.brown.shade300, width: 2),
-            ),
-            child: SingleChildScrollView(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: imgWidgets,
+        return Container(
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(color: const Color.fromRGBO(0, 0, 0, 0.1), width: 1),
+            boxShadow: const [
+              BoxShadow(
+                color: Color.fromRGBO(0, 0, 0, 0.05),
+                blurRadius: 10,
+                offset: const Offset(0, 4),
               ),
+            ],
+          ),
+          child: SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: contentWidgets,
             ),
           ),
         );
