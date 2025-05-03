@@ -4,22 +4,15 @@ import 'package:intl/intl.dart';
 import '../dashboard/line_graph.dart';
 import '../../DB/controllers/database_helper.dart';
 
-List<int> generateRandomList(int numberOfValues, int max) {
-  final random = Random();
-  return List<int>.generate(numberOfValues, (_) => random.nextInt(max + 1));
-}
-
-List<String> generateRandomDates(int n) {
-  final Random random = Random();
+// Keep the utility functions
+List<String> Get_dates_onwards(String startDateStr) {
   final DateFormat formatter = DateFormat('yyyy-MM-dd');
 
-  // Pick a random starting date within the past 90 days
-  final DateTime now = DateTime.now();
-  final int daysAgo = random.nextInt(90);
-  DateTime startDate = now.subtract(Duration(days: daysAgo));
+  // Parse the input date string to a DateTime object
+  DateTime startDate = formatter.parse(startDateStr);
 
-  // Generate sequential dates
-  List<String> sequentialDates = List.generate(n, (i) {
+  // Generate 30 sequential dates starting from the given date
+  List<String> sequentialDates = List.generate(30, (i) {
     DateTime date = startDate.add(Duration(days: i));
     return formatter.format(date);
   });
@@ -27,19 +20,53 @@ List<String> generateRandomDates(int n) {
   return sequentialDates;
 }
 
-Widget videoStatisticsGraphs(BuildContext context) {
-  int totalDays = 30;
-  List<int> views1 = generateRandomList(totalDays, 5000);
-  List<int> views2 = generateRandomList(totalDays, 134);
-  List<int> views3 = generateRandomList(totalDays, 500);
-  List<int> views4 = generateRandomList(totalDays, 90);
-
-  List<String>  dates1 = generateRandomDates(totalDays);
-  List<String>  dates2 = generateRandomDates(totalDays);
-  List<String>  dates3 = generateRandomDates(totalDays);
-  List<String>  dates4 = generateRandomDates(totalDays);
-
+// Fixed function to properly use database metrics and avoid random data generation
+Widget videoStatisticsGraphsWithDates(BuildContext context, String videoId, Map<String, List<DayMetric>> videoMetricsMap) {
   double chartHeight = MediaQuery.of(context).size.height > 600 ? 300 : 200;
+  
+  // Get creation date from metrics if available, otherwise use current date minus 30 days
+  String defaultStartDate = DateFormat('yyyy-MM-dd').format(DateTime.now().subtract(Duration(days: 30)));
+  String startDate = defaultStartDate;
+  
+  // Create arrays for storing our metrics data
+  int totalDays = 30;
+  List<int> views = List.filled(totalDays, 0);
+  List<int> wchtime = List.filled(totalDays, 0);
+  
+  // Try to get the earliest date from metrics if available
+  if (videoMetricsMap.containsKey(videoId) && videoMetricsMap[videoId]!.isNotEmpty) {
+    List<DayMetric> metrics = videoMetricsMap[videoId]!;
+    if (metrics.isNotEmpty) {
+      // Sort by date and get the earliest date
+      metrics.sort((a, b) => a.date.compareTo(b.date));
+      startDate = metrics.first.date;
+      
+      // Calculate how many days exist between each metric date and the start date
+      // This ensures we place each metric on the correct day in our 30-day array
+      final DateFormat formatter = DateFormat('yyyy-MM-dd');
+      DateTime startDateTime = formatter.parse(startDate);
+      
+      // Fill the arrays with actual data from the metrics
+      for (DayMetric metric in metrics) {
+        DateTime metricDate = formatter.parse(metric.date);
+        int dayIndex = metricDate.difference(startDateTime).inDays;
+        
+        // Only add if the day is within our 30 day window
+        if (dayIndex >= 0 && dayIndex < totalDays) {
+          views[dayIndex] = metric.views;
+          wchtime[dayIndex] = metric.watchtime;
+        }
+      }
+    }
+  }
+  
+  // Generate dates for the x-axis
+  List<String> dates = Get_dates_onwards(startDate);
+  
+  // For subscribers and revenue, still use random data (assuming these aren't in DayMetric)
+  // In a real app, we'd want to get these from the database too
+  List<int> subs = List.generate(totalDays, (_) => Random().nextInt(134 + 1));
+  List<int> rev = List.generate(totalDays, (_) => Random().nextInt(90 + 1));
 
   return Padding(
     padding: const EdgeInsets.all(16.0),
@@ -52,7 +79,7 @@ Widget videoStatisticsGraphs(BuildContext context) {
           BoxShadow(
             color: Color.fromRGBO(128, 128, 128, 0.2),
             blurRadius: 8,
-            offset: const Offset(0, 4),
+            offset: Offset(0, 4),
           ),
         ],
       ),
@@ -63,9 +90,9 @@ Widget videoStatisticsGraphs(BuildContext context) {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                buildLineChart(totalDays, views1, dates1, "Date", "Views", "Views", chartHeight),
+                buildLineChart(dates.length, views, dates, "Date", "Views", "Views", chartHeight),
                 const SizedBox(height: 24),
-                buildLineChart(totalDays, views3, dates2, "Date", "Wt (hrs)", "Watch Time", chartHeight),
+                buildLineChart(dates.length, wchtime, dates, "Date", "Wt (hrs)", "Watch Time", chartHeight),
               ],
             ),
           ),
@@ -74,9 +101,9 @@ Widget videoStatisticsGraphs(BuildContext context) {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                buildLineChart(totalDays, views2, dates3, "Date", "Subscribers", "Subscribers", chartHeight),
+                buildLineChart(dates.length, subs, dates, "Date", "Subscribers", "Subscribers", chartHeight),
                 const SizedBox(height: 24),
-                buildLineChart(totalDays, views4, dates4, "Date", "\$ Earned", "Estimated Revenue", chartHeight),
+                buildLineChart(dates.length, rev, dates, "Date", "\$ Earned", "Estimated Revenue", chartHeight),
               ],
             ),
           ),
@@ -130,6 +157,18 @@ class VideoData {
   });
 }
 
+class DayMetric {
+  final String date;
+  final int views;
+  final int watchtime;
+
+  DayMetric({
+    required this.date,
+    required this.views,
+    required this.watchtime,
+  });
+}
+
 class _VideoListWidgetState extends State<VideoListWidget> {
   List<int> clickedIndexes = []; // Track the indexes where videos are clicked
   List<VideoData> videos = [];
@@ -138,6 +177,9 @@ class _VideoListWidgetState extends State<VideoListWidget> {
   String errorMessage = '';
   SortCriteria currentSortCriteria = SortCriteria.views;
   bool ascending = false;
+  
+  // Add this property to store video metrics
+  Map<String, List<DayMetric>> videoMetrics = {};
 
   @override
   void initState() {
@@ -181,11 +223,59 @@ class _VideoListWidgetState extends State<VideoListWidget> {
   Future<void> _loadVideos(String userId) async {
     try {
       final userVideos = await DatabaseHelper.instance.getUserVideos(userId);
-      
-      // Convert database data to VideoData objects
-      List<VideoData> loadedVideos = userVideos.map((video) {
-        return VideoData(
-          videoId: video['video_id'] as String,
+
+      List<VideoData> loadedVideos = [];
+      Map<String, List<DayMetric>> loadedVideoMetrics = {}; // Stores daily metrics for each video
+
+      for (var video in userVideos) {
+        final videoId = video['video_id'] as String;
+        
+        try {
+          // Fetch daily metrics from the database
+          List<Map<String, dynamic>> metrics = [];
+          
+          // Wrap the database call in a try-catch to handle any database errors
+          try {
+            metrics = await DatabaseHelper.instance.getVideoMetrics(videoId);
+          } catch (dbError) {
+            // If there's a database error, just log it and continue with empty metrics
+            print('Database error fetching metrics for video $videoId: $dbError');
+            metrics = []; // Reset to empty list
+          }
+          
+          // Process metrics if available
+          if (metrics.isNotEmpty) {
+            // Sort metrics by date (ascending)
+            metrics.sort((a, b) => (a['day'] as String).compareTo(b['day'] as String));
+            
+            // Take last 30 entries or all if fewer than 30
+            final last30 = metrics.length > 30 ? metrics.sublist(metrics.length - 30) : metrics;
+
+            // Convert raw metrics into DayMetric objects
+            final List<DayMetric> dailyMetrics = [];
+            
+            for (var entry in last30) {
+              dailyMetrics.add(DayMetric(
+                date: entry['day'] as String,
+                views: entry['day_views'] as int,
+                watchtime: entry['watchtime'] as int,
+              ));
+            }
+
+            loadedVideoMetrics[videoId] = dailyMetrics;
+          } else {
+            // If no metrics found, create an empty array instead of having no key
+            loadedVideoMetrics[videoId] = [];
+          }
+        } catch (metricError) {
+          // Just log the error and continue - we'll use an empty array for this video
+          print('Failed to load metrics for video $videoId: $metricError');
+          loadedVideoMetrics[videoId] = [];
+        }
+
+        // Create and add VideoData object to the list
+        loadedVideos.add(VideoData(
+          videoId: videoId,
           videoName: video['video_name'] as String,
           views: video['views'] as int,
           subscribers: video['subs'] as int,
@@ -193,18 +283,17 @@ class _VideoListWidgetState extends State<VideoListWidget> {
           comments: video['comments'] as int,
           watchtime: video['watchtime'] as int,
           creationDate: video['creation_date'] as String,
-          // Randomly select one of the available thumbnails for demonstration
           thumbnailPath: "imgs/thumbnail_${Random().nextInt(4) + 1}.jpg",
-        );
-      }).toList();
+        ));
+      }
 
-      // Sort initially by views (descending)
-      _sortVideos(loadedVideos, SortCriteria.views, false);
-
+      // Save state
       setState(() {
         videos = loadedVideos;
+        videoMetrics = loadedVideoMetrics; // Store the metrics in state
         isLoading = false;
       });
+
     } catch (e) {
       setState(() {
         errorMessage = 'Error loading videos: $e';
@@ -458,7 +547,7 @@ class _VideoListWidgetState extends State<VideoListWidget> {
             : const EdgeInsets.symmetric(horizontal: 8, vertical: 6);
 
         const baseColor = Colors.white;
-        final clickedColor = const Color.fromARGB(255, 245, 245, 245);
+        const clickedColor = Color.fromARGB(255, 245, 245, 245);
 
         if (isLoading) {
           return const Center(child: CircularProgressIndicator());
@@ -495,7 +584,7 @@ class _VideoListWidgetState extends State<VideoListWidget> {
                     BoxShadow(
                       color: Color.fromRGBO(0, 0, 0, 0.05),
                       blurRadius: 5,
-                      offset: const Offset(0, 2),
+                      offset: Offset(0, 2),
                     ),
                   ],
                 ),
@@ -591,7 +680,7 @@ class _VideoListWidgetState extends State<VideoListWidget> {
               ),
             ),
           );
-
+        
           // If the current video is clicked, add the videoStatisticsGraphs widget below it
           if (clickedIndexes.contains(i)) {
             contentWidgets.add(
@@ -602,8 +691,9 @@ class _VideoListWidgetState extends State<VideoListWidget> {
                     width: screenWidth / 2,
                     child: AnimatedOpacity(
                       duration: const Duration(milliseconds: 800),
-                      opacity: clickedIndexes.contains(i) ? 1.0 : 0.0,
-                      child: videoStatisticsGraphs(context),
+                      opacity: 1.0,
+                      // Pass the actual video metrics data from our state
+                      child: videoStatisticsGraphsWithDates(context, video.videoId, videoMetrics),
                     ),
                   ),
                 ),
@@ -622,7 +712,7 @@ class _VideoListWidgetState extends State<VideoListWidget> {
               BoxShadow(
                 color: Color.fromRGBO(0, 0, 0, 0.05),
                 blurRadius: 10,
-                offset: const Offset(0, 4),
+                offset: Offset(0, 4),
               ),
             ],
           ),

@@ -150,14 +150,14 @@ class _LoginScreenState extends State<LoginScreen> {
               const SizedBox(height: 16),
               Text(
                 _isLogin ? 'Welcome Back' : 'Create Account',
-                style: TextStyle(
+                style: const TextStyle(
                   fontSize: 28,
                   fontWeight: FontWeight.bold,
                   color: primaryColor,
                 ),
               ),
               const SizedBox(height: 24),
-              Align(
+              const Align(
                 alignment: Alignment.centerLeft,
                 child: Text(
                   'Username',
@@ -171,7 +171,7 @@ class _LoginScreenState extends State<LoginScreen> {
               TextField(
                 controller: _usernameController,
                 decoration: InputDecoration(
-                  prefixIcon: Icon(Icons.person_outline, color: primaryColor),
+                  prefixIcon: const Icon(Icons.person_outline, color: primaryColor),
                   hintText: 'Enter your username',
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
@@ -181,7 +181,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
               ),
               const SizedBox(height: 18),
-              Align(
+              const Align(
                 alignment: Alignment.centerLeft,
                 child: Text(
                   'Password',
@@ -196,7 +196,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 controller: _passwordController,
                 obscureText: _obscurePassword,
                 decoration: InputDecoration(
-                  prefixIcon: Icon(Icons.lock_outline, color: primaryColor),
+                  prefixIcon: const Icon(Icons.lock_outline, color: primaryColor),
                   hintText: 'Enter your password',
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
@@ -241,7 +241,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   onPressed: _isLogin ? _handleSignIn : _handleSignUp,
                   child: Text(
                     _isLogin ? 'Sign in' : 'Sign up',
-                    style: TextStyle(
+                    style: const TextStyle(
                         fontSize: 18,
                         color: primaryColor,
                         fontWeight: FontWeight.bold),
@@ -256,7 +256,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     _isLogin
                         ? "Don't have an account? "
                         : 'Already have an account? ',
-                    style: TextStyle(color: primaryColor),
+                    style: const TextStyle(color: primaryColor),
                   ),
                   GestureDetector(
                     onTap: () {
@@ -267,7 +267,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     },
                     child: Text(
                       _isLogin ? 'Sign up' : 'Sign in',
-                      style: TextStyle(
+                      style: const TextStyle(
                         color: accentColor,
                         fontWeight: FontWeight.bold,
                       ),

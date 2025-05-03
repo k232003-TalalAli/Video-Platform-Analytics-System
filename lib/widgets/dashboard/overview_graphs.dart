@@ -156,8 +156,8 @@ class _TopVideosWidgetState extends State<TopVideosWidget> {
     ];
 
     
-    String comments_rev_HARDCODED="100";
-    String Watch_time="100 hrs";
+    String commentsRevHardcoded="100";
+    String watchTime="100 hrs";
     String Views="120K";
 
       //HARDCODED VALUES END --------------------------------------------------------------------------------------------------
@@ -200,7 +200,7 @@ class _TopVideosWidgetState extends State<TopVideosWidget> {
                     Row(
                             children: [
                               Icon(Icons.date_range, size: 16, color: Colors.grey[600]),
-                              SizedBox(width: 6),
+                              const SizedBox(width: 6),
                               Text(
                                 imgDates[i],
                                 style: TextStyle(
@@ -208,9 +208,9 @@ class _TopVideosWidgetState extends State<TopVideosWidget> {
                                   color: Colors.grey[600],
                                 ),
                               ),
-                              SizedBox(width: 30), // More horizontal space
+                              const SizedBox(width: 30), // More horizontal space
                               Icon(Icons.visibility, size: 16, color: Colors.grey[600]),
-                              SizedBox(width: 6),
+                              const SizedBox(width: 6),
                               Text(
                                 Views,
                                 style: TextStyle(
@@ -218,31 +218,31 @@ class _TopVideosWidgetState extends State<TopVideosWidget> {
                                   color: Colors.grey[600],
                                 ),
                               ),
-                              SizedBox(width: 30),
+                              const SizedBox(width: 30),
                               Icon(Icons.comment, size: 16, color: Colors.grey[600]),
-                              SizedBox(width: 6),
+                              const SizedBox(width: 6),
                               Text(
-                               comments_rev_HARDCODED,
+                               commentsRevHardcoded,
                                 style: TextStyle(
                                   fontSize: dateFontSize,
                                   color: Colors.grey[600],
                                 ),
                               ),
-                              SizedBox(width: 30),
+                              const SizedBox(width: 30),
                               Icon(Icons.attach_money, size: 16, color: Colors.grey[600]),
-                              SizedBox(width: 6),
+                              const SizedBox(width: 6),
                               Text(
-                              comments_rev_HARDCODED,
+                              commentsRevHardcoded,
                                 style: TextStyle(
                                   fontSize: dateFontSize,
                                   color: Colors.grey[600],
                                 ),
                               ),
-                              SizedBox(width: 30),
+                              const SizedBox(width: 30),
                               Icon(Icons.access_time, size: 16, color: Colors.grey[600]),
-                              SizedBox(width: 6),
+                              const SizedBox(width: 6),
                               Text(
-                                Watch_time,
+                                watchTime,
                                 style: TextStyle(
                                   fontSize: dateFontSize,
                                   color: Colors.grey[600],
@@ -290,7 +290,7 @@ class _TopVideosWidgetState extends State<TopVideosWidget> {
   }
 }
 
-Widget over_view_widget(String _channelName, String _channelDescription, String _profileImageUrl, {String? userId}) {
+Widget over_view_widget(String channelName, String channelDescription, String profileImageUrl, {String? userId}) {
   return LayoutBuilder(
     builder: (context, constraints) {
       bool isWideScreen = constraints.maxWidth > 800;
@@ -304,14 +304,14 @@ Widget over_view_widget(String _channelName, String _channelDescription, String 
                   children: [
                     Expanded(child: overview_graphs(context)),
                     const SizedBox(width: 32),
-                    Expanded(child: TopVideosWidget(_channelName, _channelDescription, _profileImageUrl, userId: userId)),
+                    Expanded(child: TopVideosWidget(channelName, channelDescription, profileImageUrl, userId: userId)),
                   ],
                 )
               : Column(
                   children: [
                     overview_graphs(context),
                     const SizedBox(height: 32),
-                    TopVideosWidget(_channelName, _channelDescription, _profileImageUrl, userId: userId),
+                    TopVideosWidget(channelName, channelDescription, profileImageUrl, userId: userId),
                   ],
                 ),
         ),

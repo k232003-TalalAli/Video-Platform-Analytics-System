@@ -19,7 +19,7 @@ Widget buildLineChart(
     if (y > maxY) maxY = y;
   }
 
-  double yInterval = (maxY / 5).ceilToDouble();
+  double yInterval = ((maxY / 5).ceilToDouble()).clamp(1, double.infinity);
 
   // Ensure valid label indexes (start, middle, end)
   List<int> labelIndexes = [];
@@ -69,10 +69,10 @@ Widget buildLineChart(
                 minY: 0,
                 maxY: maxY + yInterval,
                 backgroundColor: Colors.white,
-                clipData: FlClipData.all(),
+                clipData: const FlClipData.all(),
                 titlesData: FlTitlesData(
-                  topTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
-                  rightTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                  topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                  rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
                   bottomTitles: AxisTitles(
                     sideTitles: SideTitles(
                       showTitles: true,
@@ -126,12 +126,12 @@ Widget buildLineChart(
                     bottom: BorderSide(),
                   ),
                 ),
-                gridData: FlGridData(show: false),
+                gridData: const FlGridData(show: false),
                 lineBarsData: [
                   LineChartBarData(
                     spots: spots,
                     isCurved: false,
-                    dotData: FlDotData(show: false),
+                    dotData: const FlDotData(show: false),
                     belowBarData: BarAreaData(show: false),
                     color: Colors.blue,
                     barWidth: 2.5,
