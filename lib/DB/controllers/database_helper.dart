@@ -28,6 +28,7 @@ class DatabaseHelper {
       path,
       version: 1,
       onCreate: _createDB,
+      readOnly: false,
       onOpen: (db) async {
         // Check if all_users table exists
         final tables = await db.query('sqlite_master',

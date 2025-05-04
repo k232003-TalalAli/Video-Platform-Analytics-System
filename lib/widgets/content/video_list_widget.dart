@@ -21,36 +21,39 @@ List<String> Get_dates_onwards(String startDateStr) {
 }
 
 // Fixed function to properly use database metrics and avoid random data generation
-Widget videoStatisticsGraphsWithDates(BuildContext context, String videoId, Map<String, List<DayMetric>> videoMetricsMap) {
+Widget videoStatisticsGraphsWithDates(BuildContext context, String videoId,
+    Map<String, List<DayMetric>> videoMetricsMap) {
   double chartHeight = MediaQuery.of(context).size.height > 600 ? 300 : 200;
-  
+
   // Get creation date from metrics if available, otherwise use current date minus 30 days
-  String defaultStartDate = DateFormat('yyyy-MM-dd').format(DateTime.now().subtract(Duration(days: 30)));
+  String defaultStartDate = DateFormat('yyyy-MM-dd')
+      .format(DateTime.now().subtract(Duration(days: 30)));
   String startDate = defaultStartDate;
-  
+
   // Create arrays for storing our metrics data
   int totalDays = 30;
   List<int> views = List.filled(totalDays, 0);
   List<int> wchtime = List.filled(totalDays, 0);
-  
+
   // Try to get the earliest date from metrics if available
-  if (videoMetricsMap.containsKey(videoId) && videoMetricsMap[videoId]!.isNotEmpty) {
+  if (videoMetricsMap.containsKey(videoId) &&
+      videoMetricsMap[videoId]!.isNotEmpty) {
     List<DayMetric> metrics = videoMetricsMap[videoId]!;
     if (metrics.isNotEmpty) {
       // Sort by date and get the earliest date
       metrics.sort((a, b) => a.date.compareTo(b.date));
       startDate = metrics.first.date;
-      
+
       // Calculate how many days exist between each metric date and the start date
       // This ensures we place each metric on the correct day in our 30-day array
       final DateFormat formatter = DateFormat('yyyy-MM-dd');
       DateTime startDateTime = formatter.parse(startDate);
-      
+
       // Fill the arrays with actual data from the metrics
       for (DayMetric metric in metrics) {
         DateTime metricDate = formatter.parse(metric.date);
         int dayIndex = metricDate.difference(startDateTime).inDays;
-        
+
         // Only add if the day is within our 30 day window
         if (dayIndex >= 0 && dayIndex < totalDays) {
           views[dayIndex] = metric.views;
@@ -59,10 +62,10 @@ Widget videoStatisticsGraphsWithDates(BuildContext context, String videoId, Map<
       }
     }
   }
-  
+
   // Generate dates for the x-axis
   List<String> dates = Get_dates_onwards(startDate);
-  
+
   // For subscribers and revenue, still use random data (assuming these aren't in DayMetric)
   // In a real app, we'd want to get these from the database too
   List<int> subs = List.generate(totalDays, (_) => Random().nextInt(134 + 1));
@@ -90,9 +93,11 @@ Widget videoStatisticsGraphsWithDates(BuildContext context, String videoId, Map<
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                buildLineChart(dates.length, views, dates, "Date", "Views", "Views", chartHeight),
+                buildLineChart(dates.length, views, dates, "Date", "Views",
+                    "Views", chartHeight),
                 const SizedBox(height: 24),
-                buildLineChart(dates.length, wchtime, dates, "Date", "Wt (hrs)", "Watch Time", chartHeight),
+                buildLineChart(dates.length, wchtime, dates, "Date", "Wt (hrs)",
+                    "Watch Time", chartHeight),
               ],
             ),
           ),
@@ -101,9 +106,11 @@ Widget videoStatisticsGraphsWithDates(BuildContext context, String videoId, Map<
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                buildLineChart(dates.length, subs, dates, "Date", "Subscribers", "Subscribers", chartHeight),
+                buildLineChart(dates.length, subs, dates, "Date", "Subscribers",
+                    "Subscribers", chartHeight),
                 const SizedBox(height: 24),
-                buildLineChart(dates.length, rev, dates, "Date", "\$ Earned", "Estimated Revenue", chartHeight),
+                buildLineChart(dates.length, rev, dates, "Date", "\$ Earned",
+                    "Estimated Revenue", chartHeight),
               ],
             ),
           ),
@@ -115,7 +122,7 @@ Widget videoStatisticsGraphsWithDates(BuildContext context, String videoId, Map<
 
 class VideoListWidget extends StatefulWidget {
   final String? userId;
-  
+
   const VideoListWidget({
     super.key,
     this.userId,
@@ -125,13 +132,7 @@ class VideoListWidget extends StatefulWidget {
   State<VideoListWidget> createState() => _VideoListWidgetState();
 }
 
-enum SortCriteria {
-  views,
-  revenue,
-  watchtime,
-  subscribers,
-  date
-}
+enum SortCriteria { views, revenue, watchtime, subscribers, date }
 
 class VideoData {
   final String videoId;
@@ -177,7 +178,7 @@ class _VideoListWidgetState extends State<VideoListWidget> {
   String errorMessage = '';
   SortCriteria currentSortCriteria = SortCriteria.views;
   bool ascending = false;
-  
+
   // Add this property to store video metrics
   Map<String, List<DayMetric>> videoMetrics = {};
 
@@ -208,7 +209,7 @@ class _VideoListWidgetState extends State<VideoListWidget> {
           });
           return;
         }
-        
+
         currentUserId = allUsers.first['user_id'] as String;
         await _loadVideos(currentUserId);
       }
@@ -225,35 +226,43 @@ class _VideoListWidgetState extends State<VideoListWidget> {
       final userVideos = await DatabaseHelper.instance.getUserVideos(userId);
 
       List<VideoData> loadedVideos = [];
-      Map<String, List<DayMetric>> loadedVideoMetrics = {}; // Stores daily metrics for each video
+      Map<String, List<DayMetric>> loadedVideoMetrics =
+          {}; // Stores daily metrics for each video
 
       for (var video in userVideos) {
         final videoId = video['video_id'] as String;
-        
+
         try {
           // Fetch daily metrics from the database
           List<Map<String, dynamic>> metrics = [];
-          
+
           // Wrap the database call in a try-catch to handle any database errors
           try {
             metrics = await DatabaseHelper.instance.getVideoMetrics(videoId);
           } catch (dbError) {
             // If there's a database error, just log it and continue with empty metrics
-            print('Database error fetching metrics for video $videoId: $dbError');
+            print(
+                'Database error fetching metrics for video $videoId: $dbError');
             metrics = []; // Reset to empty list
           }
-          
+
           // Process metrics if available
           if (metrics.isNotEmpty) {
+            // Create a mutable copy of the metrics list first
+            var mutableMetrics = List<Map<String, dynamic>>.from(metrics);
+
             // Sort metrics by date (ascending)
-            metrics.sort((a, b) => (a['day'] as String).compareTo(b['day'] as String));
-            
+            mutableMetrics.sort(
+                (a, b) => (a['day'] as String).compareTo(b['day'] as String));
+
             // Take last 30 entries or all if fewer than 30
-            final last30 = metrics.length > 30 ? metrics.sublist(metrics.length - 30) : metrics;
+            final last30 = mutableMetrics.length > 30
+                ? mutableMetrics.sublist(mutableMetrics.length - 30)
+                : mutableMetrics;
 
             // Convert raw metrics into DayMetric objects
             final List<DayMetric> dailyMetrics = [];
-            
+
             for (var entry in last30) {
               dailyMetrics.add(DayMetric(
                 date: entry['day'] as String,
@@ -293,7 +302,6 @@ class _VideoListWidgetState extends State<VideoListWidget> {
         videoMetrics = loadedVideoMetrics; // Store the metrics in state
         isLoading = false;
       });
-
     } catch (e) {
       setState(() {
         errorMessage = 'Error loading videos: $e';
@@ -305,19 +313,28 @@ class _VideoListWidgetState extends State<VideoListWidget> {
   void _sortVideos(List<VideoData> videoList, SortCriteria criteria, bool asc) {
     switch (criteria) {
       case SortCriteria.views:
-        videoList.sort((a, b) => asc ? a.views.compareTo(b.views) : b.views.compareTo(a.views));
+        videoList.sort((a, b) =>
+            asc ? a.views.compareTo(b.views) : b.views.compareTo(a.views));
         break;
       case SortCriteria.revenue:
-        videoList.sort((a, b) => asc ? a.revenue.compareTo(b.revenue) : b.revenue.compareTo(a.revenue));
+        videoList.sort((a, b) => asc
+            ? a.revenue.compareTo(b.revenue)
+            : b.revenue.compareTo(a.revenue));
         break;
       case SortCriteria.watchtime:
-        videoList.sort((a, b) => asc ? a.watchtime.compareTo(b.watchtime) : b.watchtime.compareTo(a.watchtime));
+        videoList.sort((a, b) => asc
+            ? a.watchtime.compareTo(b.watchtime)
+            : b.watchtime.compareTo(a.watchtime));
         break;
       case SortCriteria.subscribers:
-        videoList.sort((a, b) => asc ? a.subscribers.compareTo(b.subscribers) : b.subscribers.compareTo(a.subscribers));
+        videoList.sort((a, b) => asc
+            ? a.subscribers.compareTo(b.subscribers)
+            : b.subscribers.compareTo(a.subscribers));
         break;
       case SortCriteria.date:
-        videoList.sort((a, b) => asc ? a.creationDate.compareTo(b.creationDate) : b.creationDate.compareTo(a.creationDate));
+        videoList.sort((a, b) => asc
+            ? a.creationDate.compareTo(b.creationDate)
+            : b.creationDate.compareTo(a.creationDate));
         break;
     }
   }
@@ -364,65 +381,68 @@ class _VideoListWidgetState extends State<VideoListWidget> {
 
   Widget _buildSortButton(SortCriteria criteria, String text, IconData icon) {
     final bool isSelected = currentSortCriteria == criteria;
-    
-    return StatefulBuilder(
-      builder: (context, setState) {
-        bool isHovering = false;
-        bool isPressed = false;
-        
-        return MouseRegion(
-          onEnter: (_) => setState(() => isHovering = true),
-          onExit: (_) => setState(() => isHovering = false),
-          cursor: SystemMouseCursors.click,
-          child: GestureDetector(
-            onTap: () => onSortChanged(criteria),
-            onTapDown: (_) => setState(() => isPressed = true),
-            onTapUp: (_) => setState(() => isPressed = false),
-            onTapCancel: () => setState(() => isPressed = false),
-            child: Transform.scale(
-              scale: isPressed ? 0.97 : 1.0,
-              child: AnimatedContainer(
-                duration: const Duration(milliseconds: 150),
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-                decoration: BoxDecoration(
-                  color: isSelected ? Colors.black : (isHovering ? Colors.grey.shade100 : Colors.white),
-                  borderRadius: BorderRadius.circular(24),
-                  border: Border.all(
-                    color: isHovering ? Colors.grey.shade400 : Colors.grey.shade300
+
+    return StatefulBuilder(builder: (context, setState) {
+      bool isHovering = false;
+      bool isPressed = false;
+
+      return MouseRegion(
+        onEnter: (_) => setState(() => isHovering = true),
+        onExit: (_) => setState(() => isHovering = false),
+        cursor: SystemMouseCursors.click,
+        child: GestureDetector(
+          onTap: () => onSortChanged(criteria),
+          onTapDown: (_) => setState(() => isPressed = true),
+          onTapUp: (_) => setState(() => isPressed = false),
+          onTapCancel: () => setState(() => isPressed = false),
+          child: Transform.scale(
+            scale: isPressed ? 0.97 : 1.0,
+            child: AnimatedContainer(
+              duration: const Duration(milliseconds: 150),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+              decoration: BoxDecoration(
+                color: isSelected
+                    ? Colors.black
+                    : (isHovering ? Colors.grey.shade100 : Colors.white),
+                borderRadius: BorderRadius.circular(24),
+                border: Border.all(
+                    color: isHovering
+                        ? Colors.grey.shade400
+                        : Colors.grey.shade300),
+                boxShadow: [
+                  BoxShadow(
+                    color: Color.fromRGBO(0, 0, 0, isPressed ? 0.02 : 0.05),
+                    spreadRadius: isPressed ? 0 : 1,
+                    blurRadius: isPressed ? 1 : 2,
+                    offset: Offset(0, isPressed ? 0 : 1),
                   ),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Color.fromRGBO(0, 0, 0, isPressed ? 0.02 : 0.05),
-                      spreadRadius: isPressed ? 0 : 1,
-                      blurRadius: isPressed ? 1 : 2,
-                      offset: Offset(0, isPressed ? 0 : 1),
-                    ),
-                  ],
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(
-                      icon, 
-                      size: 18, 
+                ],
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(
+                    icon,
+                    size: 18,
+                    color: isSelected ? Colors.white : Colors.grey.shade700,
+                  ),
+                  const SizedBox(width: 6),
+                  Text(
+                    text,
+                    style: TextStyle(
                       color: isSelected ? Colors.white : Colors.grey.shade700,
+                      fontWeight: isHovering || isSelected
+                          ? FontWeight.w600
+                          : FontWeight.w500,
                     ),
-                    const SizedBox(width: 6),
-                    Text(
-                      text,
-                      style: TextStyle(
-                        color: isSelected ? Colors.white : Colors.grey.shade700,
-                        fontWeight: isHovering || isSelected ? FontWeight.w600 : FontWeight.w500,
-                      ),
-                    ),
-                  ],
-                ),
+                  ),
+                ],
               ),
             ),
           ),
-        );
-      }
-    );
+        ),
+      );
+    });
   }
 
   Widget _buildSortMenu() {
@@ -445,68 +465,72 @@ class _VideoListWidgetState extends State<VideoListWidget> {
               scrollDirection: Axis.horizontal,
               child: Row(
                 children: [
-                  _buildSortButton(SortCriteria.views, 'Views', Icons.visibility),
+                  _buildSortButton(
+                      SortCriteria.views, 'Views', Icons.visibility),
                   const SizedBox(width: 8),
-                  _buildSortButton(SortCriteria.subscribers, 'Subscribers', Icons.people),
+                  _buildSortButton(
+                      SortCriteria.subscribers, 'Subscribers', Icons.people),
                   const SizedBox(width: 8),
-                  _buildSortButton(SortCriteria.watchtime, 'Watch Time', Icons.access_time),
+                  _buildSortButton(
+                      SortCriteria.watchtime, 'Watch Time', Icons.access_time),
                   const SizedBox(width: 8),
-                  _buildSortButton(SortCriteria.revenue, 'Revenue', Icons.attach_money),
+                  _buildSortButton(
+                      SortCriteria.revenue, 'Revenue', Icons.attach_money),
                 ],
               ),
             ),
           ),
           const SizedBox(width: 12),
-          StatefulBuilder(
-            builder: (context, setState) {
-              bool isHovering = false;
-              bool isPressed = false;
-              
-              return MouseRegion(
-                onEnter: (_) => setState(() => isHovering = true),
-                onExit: (_) => setState(() => isHovering = false),
-                cursor: SystemMouseCursors.click,
-                child: GestureDetector(
-                  onTap: () {
-                    this.setState(() {
-                      ascending = !ascending;
-                      _sortVideos(videos, currentSortCriteria, ascending);
-                    });
-                  },
-                  onTapDown: (_) => setState(() => isPressed = true),
-                  onTapUp: (_) => setState(() => isPressed = false),
-                  onTapCancel: () => setState(() => isPressed = false),
-                  child: Transform.scale(
-                    scale: isPressed ? 0.95 : 1.0,
-                    child: AnimatedContainer(
-                      duration: const Duration(milliseconds: 150),
-                      padding: const EdgeInsets.all(10),
-                      decoration: BoxDecoration(
-                        color: isHovering ? Colors.grey.shade100 : Colors.white,
-                        shape: BoxShape.circle,
-                        border: Border.all(
-                          color: isHovering ? Colors.grey.shade400 : Colors.grey.shade300
+          StatefulBuilder(builder: (context, setState) {
+            bool isHovering = false;
+            bool isPressed = false;
+
+            return MouseRegion(
+              onEnter: (_) => setState(() => isHovering = true),
+              onExit: (_) => setState(() => isHovering = false),
+              cursor: SystemMouseCursors.click,
+              child: GestureDetector(
+                onTap: () {
+                  this.setState(() {
+                    ascending = !ascending;
+                    _sortVideos(videos, currentSortCriteria, ascending);
+                  });
+                },
+                onTapDown: (_) => setState(() => isPressed = true),
+                onTapUp: (_) => setState(() => isPressed = false),
+                onTapCancel: () => setState(() => isPressed = false),
+                child: Transform.scale(
+                  scale: isPressed ? 0.95 : 1.0,
+                  child: AnimatedContainer(
+                    duration: const Duration(milliseconds: 150),
+                    padding: const EdgeInsets.all(10),
+                    decoration: BoxDecoration(
+                      color: isHovering ? Colors.grey.shade100 : Colors.white,
+                      shape: BoxShape.circle,
+                      border: Border.all(
+                          color: isHovering
+                              ? Colors.grey.shade400
+                              : Colors.grey.shade300),
+                      boxShadow: [
+                        BoxShadow(
+                          color:
+                              Color.fromRGBO(0, 0, 0, isPressed ? 0.02 : 0.05),
+                          spreadRadius: isPressed ? 0 : 1,
+                          blurRadius: isPressed ? 1 : 2,
+                          offset: Offset(0, isPressed ? 0 : 1),
                         ),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Color.fromRGBO(0, 0, 0, isPressed ? 0.02 : 0.05),
-                            spreadRadius: isPressed ? 0 : 1,
-                            blurRadius: isPressed ? 1 : 2,
-                            offset: Offset(0, isPressed ? 0 : 1),
-                          ),
-                        ],
-                      ),
-                      child: Icon(
-                        ascending ? Icons.arrow_upward : Icons.arrow_downward,
-                        size: 20,
-                        color: Colors.black,
-                      ),
+                      ],
+                    ),
+                    child: Icon(
+                      ascending ? Icons.arrow_upward : Icons.arrow_downward,
+                      size: 20,
+                      color: Colors.black,
                     ),
                   ),
                 ),
-              );
-            }
-          ),
+              ),
+            );
+          }),
         ],
       ),
     );
@@ -554,7 +578,9 @@ class _VideoListWidgetState extends State<VideoListWidget> {
         }
 
         if (errorMessage.isNotEmpty) {
-          return Center(child: Text(errorMessage, style: const TextStyle(color: Colors.red)));
+          return Center(
+              child: Text(errorMessage,
+                  style: const TextStyle(color: Colors.red)));
         }
 
         if (videos.isEmpty) {
@@ -577,8 +603,10 @@ class _VideoListWidgetState extends State<VideoListWidget> {
                 margin: EdgeInsets.symmetric(vertical: spacing / 2),
                 padding: videoPadding,
                 decoration: BoxDecoration(
-                  color: clickedIndexes.contains(i) ? clickedColor : Colors.white,
-                  border: Border.all(color: const Color.fromRGBO(0, 0, 0, 0.1), width: 1),
+                  color:
+                      clickedIndexes.contains(i) ? clickedColor : Colors.white,
+                  border: Border.all(
+                      color: const Color.fromRGBO(0, 0, 0, 0.1), width: 1),
                   borderRadius: BorderRadius.circular(borderRadius),
                   boxShadow: const [
                     BoxShadow(
@@ -601,7 +629,8 @@ class _VideoListWidgetState extends State<VideoListWidget> {
                           height: imageHeight,
                           width: imageHeight * 1.6,
                           color: Colors.grey,
-                          child: const Icon(Icons.video_library, color: Colors.white),
+                          child: const Icon(Icons.video_library,
+                              color: Colors.white),
                         );
                       },
                     ),
@@ -621,17 +650,20 @@ class _VideoListWidgetState extends State<VideoListWidget> {
                           const SizedBox(height: 30),
                           Row(
                             children: [
-                              const Icon(Icons.date_range, size: 16, color: Colors.grey),
+                              const Icon(Icons.date_range,
+                                  size: 16, color: Colors.grey),
                               const SizedBox(width: 6),
                               Text(
-                                DateFormat('yyyy-MM-dd').format(DateTime.parse(video.creationDate)),
+                                DateFormat('yyyy-MM-dd')
+                                    .format(DateTime.parse(video.creationDate)),
                                 style: TextStyle(
                                   fontSize: dateFontSize,
                                   color: Colors.grey[600],
                                 ),
                               ),
                               const SizedBox(width: 30),
-                              const Icon(Icons.visibility, size: 16, color: Colors.grey),
+                              const Icon(Icons.visibility,
+                                  size: 16, color: Colors.grey),
                               const SizedBox(width: 6),
                               Text(
                                 _formatNumber(video.views),
@@ -641,7 +673,8 @@ class _VideoListWidgetState extends State<VideoListWidget> {
                                 ),
                               ),
                               const SizedBox(width: 30),
-                              Icon(Icons.comment, size: 16, color: Colors.grey[600]),
+                              Icon(Icons.comment,
+                                  size: 16, color: Colors.grey[600]),
                               const SizedBox(width: 6),
                               Text(
                                 _formatNumber(video.comments),
@@ -651,7 +684,8 @@ class _VideoListWidgetState extends State<VideoListWidget> {
                                 ),
                               ),
                               const SizedBox(width: 30),
-                              Icon(Icons.attach_money, size: 16, color: Colors.grey[600]),
+                              Icon(Icons.attach_money,
+                                  size: 16, color: Colors.grey[600]),
                               const SizedBox(width: 6),
                               Text(
                                 '\$${video.revenue.toStringAsFixed(2)}',
@@ -661,7 +695,8 @@ class _VideoListWidgetState extends State<VideoListWidget> {
                                 ),
                               ),
                               const SizedBox(width: 30),
-                              Icon(Icons.access_time, size: 16, color: Colors.grey[600]),
+                              Icon(Icons.access_time,
+                                  size: 16, color: Colors.grey[600]),
                               const SizedBox(width: 6),
                               Text(
                                 _formatWatchTime(video.watchtime),
@@ -680,7 +715,7 @@ class _VideoListWidgetState extends State<VideoListWidget> {
               ),
             ),
           );
-        
+
           // If the current video is clicked, add the videoStatisticsGraphs widget below it
           if (clickedIndexes.contains(i)) {
             contentWidgets.add(
@@ -693,7 +728,8 @@ class _VideoListWidgetState extends State<VideoListWidget> {
                       duration: const Duration(milliseconds: 800),
                       opacity: 1.0,
                       // Pass the actual video metrics data from our state
-                      child: videoStatisticsGraphsWithDates(context, video.videoId, videoMetrics),
+                      child: videoStatisticsGraphsWithDates(
+                          context, video.videoId, videoMetrics),
                     ),
                   ),
                 ),
@@ -707,7 +743,8 @@ class _VideoListWidgetState extends State<VideoListWidget> {
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: const Color.fromRGBO(0, 0, 0, 0.1), width: 1),
+            border:
+                Border.all(color: const Color.fromRGBO(0, 0, 0, 0.1), width: 1),
             boxShadow: const [
               BoxShadow(
                 color: Color.fromRGBO(0, 0, 0, 0.05),

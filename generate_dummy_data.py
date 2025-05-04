@@ -80,7 +80,7 @@ def generate_user_data():
     users = []
     for i in range(5):
         user_id = str(uuid.uuid4())
-        creation_date = (datetime.now() - timedelta(days=random.randint(365, 3650))).isoformat()
+        creation_date = datetime.now().isoformat()
         
         user = {
             'user_id': user_id,
