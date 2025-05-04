@@ -25,51 +25,35 @@ Widget videoStatisticsGraphsWithDates(BuildContext context, String videoId,
     Map<String, List<DayMetric>> videoMetricsMap) {
   double chartHeight = MediaQuery.of(context).size.height > 600 ? 300 : 200;
 
-  // Get creation date from metrics if available, otherwise use current date minus 30 days
   String defaultStartDate = DateFormat('yyyy-MM-dd')
       .format(DateTime.now().subtract(Duration(days: 30)));
   String startDate = defaultStartDate;
 
-  // Create arrays for storing our metrics data
   int totalDays = 30;
   List<int> views = List.filled(totalDays, 0);
   List<int> wchtime = List.filled(totalDays, 0);
 
-  // Try to get the earliest date from metrics if available
   if (videoMetricsMap.containsKey(videoId) &&
       videoMetricsMap[videoId]!.isNotEmpty) {
     List<DayMetric> metrics = videoMetricsMap[videoId]!;
-    if (metrics.isNotEmpty) {
-      // Sort by date and get the earliest date
-      metrics.sort((a, b) => a.date.compareTo(b.date));
-      startDate = metrics.first.date;
+    metrics.sort((a, b) => a.date.compareTo(b.date));
+    startDate = metrics.first.date;
 
-      // Calculate how many days exist between each metric date and the start date
-      // This ensures we place each metric on the correct day in our 30-day array
-      final DateFormat formatter = DateFormat('yyyy-MM-dd');
-      DateTime startDateTime = formatter.parse(startDate);
+    final DateFormat formatter = DateFormat('yyyy-MM-dd');
+    DateTime startDateTime = formatter.parse(startDate);
 
-      // Fill the arrays with actual data from the metrics
-      for (DayMetric metric in metrics) {
-        DateTime metricDate = formatter.parse(metric.date);
-        int dayIndex = metricDate.difference(startDateTime).inDays;
+    for (DayMetric metric in metrics) {
+      DateTime metricDate = formatter.parse(metric.date);
+      int dayIndex = metricDate.difference(startDateTime).inDays;
 
-        // Only add if the day is within our 30 day window
-        if (dayIndex >= 0 && dayIndex < totalDays) {
-          views[dayIndex] = metric.views;
-          wchtime[dayIndex] = metric.watchtime;
-        }
+      if (dayIndex >= 0 && dayIndex < totalDays) {
+        views[dayIndex] = metric.views;
+        wchtime[dayIndex] = metric.watchtime;
       }
     }
   }
 
-  // Generate dates for the x-axis
   List<String> dates = Get_dates_onwards(startDate);
-
-  // For subscribers and revenue, still use random data (assuming these aren't in DayMetric)
-  // In a real app, we'd want to get these from the database too
-  List<int> subs = List.generate(totalDays, (_) => Random().nextInt(134 + 1));
-  List<int> rev = List.generate(totalDays, (_) => Random().nextInt(90 + 1));
 
   return Padding(
     padding: const EdgeInsets.all(16.0),
@@ -90,29 +74,13 @@ Widget videoStatisticsGraphsWithDates(BuildContext context, String videoId,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                buildLineChart(dates.length, views, dates, "Date", "Views",
-                    "Views", chartHeight),
-                const SizedBox(height: 24),
-                buildLineChart(dates.length, wchtime, dates, "Date", "Wt (hrs)",
-                    "Watch Time", chartHeight),
-              ],
-            ),
+            child: buildLineChart(dates.length, views, dates, "Date", "Views",
+                "Views", chartHeight),
           ),
           const SizedBox(width: 16),
           Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                buildLineChart(dates.length, subs, dates, "Date", "Subscribers",
-                    "Subscribers", chartHeight),
-                const SizedBox(height: 24),
-                buildLineChart(dates.length, rev, dates, "Date", "\$ Earned",
-                    "Estimated Revenue", chartHeight),
-              ],
-            ),
+            child: buildLineChart(dates.length, wchtime, dates, "Date", "Wt (hrs)",
+                "Watch Time", chartHeight),
           ),
         ],
       ),

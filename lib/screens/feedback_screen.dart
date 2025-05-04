@@ -62,7 +62,7 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
         channelName: _channelName,
         channelDescription: _channelDescription,
         profileImageUrl: _profileImageUrl,
-        selectedIndex: 1, // Content page index
+        selectedIndex: 2, // Content page index
         onProfileUpdate: _handleProfileUpdate,
       ),
       drawerEdgeDragWidth: 0,

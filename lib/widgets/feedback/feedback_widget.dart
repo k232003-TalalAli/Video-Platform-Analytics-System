@@ -1,8 +1,64 @@
 import 'package:flutter/material.dart';
 import 'dart:math';
 import 'package:intl/intl.dart';
-import '../../DB/controllers/database_helper.dart';
 import '../dashboard/analytics_card.dart';
+import '../dashboard/line_graph.dart';
+
+List<int> generateRandomList(int numberOfValues, int max) {
+  final random = Random();
+  return List<int>.generate(numberOfValues, (_) => random.nextInt(max + 1));
+}
+
+List<String> Get_dates_onwards(String startDateStr) {
+  final DateFormat formatter = DateFormat('yyyy-MM-dd');
+  DateTime startDate = formatter.parse(startDateStr);
+  List<String> sequentialDates = List.generate(30, (i) {
+    DateTime date = startDate.add(Duration(days: i));
+    return formatter.format(date);
+  });
+
+  return sequentialDates;
+}
+
+Widget overview_graphs(BuildContext context) {
+  int totalDays = 30;
+  List<int> CTR = generateRandomList(totalDays, 5000);
+  List<int> impressions = generateRandomList(totalDays, 134);
+
+  List<String> dates1 = Get_dates_onwards("2024-10-23");
+  List<String> dates2 = Get_dates_onwards("2024-10-23");
+
+  double chartHeight = MediaQuery.of(context).size.height > 600 ? 300 : 200;
+  double chartWidth = MediaQuery.of(context).size.width * 0.4; // adjust as needed
+
+  return Container(
+    padding: const EdgeInsets.symmetric(vertical: 25.0),
+    decoration: BoxDecoration(
+      border: Border.all(color: Colors.black87, width: 2),
+      borderRadius: BorderRadius.circular(12),
+      color: Color.fromARGB(255, 175, 215, 255)   ,
+    ),
+    child: Row(
+      mainAxisAlignment: MainAxisAlignment.center, // Center graphs horizontally
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        SizedBox(
+          width: chartWidth,
+          child: buildLineChart(
+              totalDays, CTR, dates1, "Day", "CTR", "CTR", chartHeight),
+        ),
+        const SizedBox(width: 16), // Space between graphs
+        SizedBox(
+          width: chartWidth,
+          child: buildLineChart(totalDays, impressions, dates2, "Day",
+              "Impressions", "Impressions", chartHeight),
+        ),
+      ],
+    ),
+  );
+}
+
+
 
 class VideoListWidget extends StatefulWidget {
   final String? userId;
@@ -41,77 +97,70 @@ class VideoData {
 }
 
 class _VideoListWidgetState extends State<VideoListWidget> {
-  bool isHovered = false;
-  List<VideoData> videos = [];
-  bool isLoading = true;
-  String currentUserId = '';
-  String errorMessage = '';
+  final String impressions = '1.2M';
+  final String ctr = '39%';
+  final String commentsTotal = '45.3K';
 
-  @override
-  void initState() {
-    super.initState();
-    _loadUserData();
-  }
+  final List<VideoData> videos = [
+    VideoData(
+      videoId: 'vid1',
+      videoName: 'Flutter Tutorial - Beginner to Advanced',
+      views: 120000,
+      subscribers: 1500,
+      revenue: 230.50,
+      comments: 230,
+      watchtime: 12400,
+      creationDate: '2024-05-01',
+      thumbnailPath: 'imgs/thumbnail_1.jpg',
+    ),
+    VideoData(
+      videoId: 'vid2',
+      videoName: 'Building a Chat App with Firebase',
+      views: 85000,
+      subscribers: 1100,
+      revenue: 180.00,
+      comments: 190,
+      watchtime: 9800,
+      creationDate: '2024-05-10',
+      thumbnailPath: 'imgs/thumbnail_2.jpg',
+    ),
+    VideoData(
+      videoId: 'vid3',
+      videoName: 'Dart Tips and Tricks',
+      views: 43000,
+      subscribers: 700,
+      revenue: 95.75,
+      comments: 85,
+      watchtime: 5400,
+      creationDate: '2024-05-15',
+      thumbnailPath: 'imgs/thumbnail_3.jpg',
+    ),
+    VideoData(
+      videoId: 'vid4',
+      videoName: 'State Management with Provider',
+      views: 67000,
+      subscribers: 950,
+      revenue: 142.25,
+      comments: 178,
+      watchtime: 8200,
+      creationDate: '2024-04-28',
+      thumbnailPath: 'imgs/thumbnail_1.jpg',
+    ),
+    VideoData(
+      videoId: 'vid5',
+      videoName: 'Creating Beautiful UI Animations',
+      views: 93500,
+      subscribers: 1250,
+      revenue: 197.80,
+      comments: 210,
+      watchtime: 10700,
+      creationDate: '2024-04-20',
+      thumbnailPath: 'imgs/thumbnail_1.jpg',
+    ),
+  ];
 
-  Future<void> _loadUserData() async {
-    setState(() {
-      isLoading = true;
-      errorMessage = '';
-    });
-
-    try {
-      if (widget.userId != null && widget.userId!.isNotEmpty) {
-        currentUserId = widget.userId!;
-        await _loadVideos(currentUserId);
-      } else {
-        final allUsers = await DatabaseHelper.instance.getAllUsers();
-        if (allUsers.isEmpty) {
-          setState(() {
-            errorMessage = 'No users found in the database';
-            isLoading = false;
-          });
-          return;
-        }
-
-        currentUserId = allUsers.first['user_id'] as String;
-        await _loadVideos(currentUserId);
-      }
-    } catch (e) {
-      setState(() {
-        errorMessage = 'Error loading user data: $e';
-        isLoading = false;
-      });
-    }
-  }
-
-  Future<void> _loadVideos(String userId) async {
-    try {
-      final userVideos = await DatabaseHelper.instance.getUserVideos(userId);
-      List<VideoData> loadedVideos = userVideos.map((video) {
-        return VideoData(
-          videoId: video['video_id'] as String,
-          videoName: video['video_name'] as String,
-          views: video['views'] as int,
-          subscribers: video['subs'] as int,
-          revenue: video['revenue'] as double,
-          comments: video['comments'] as int,
-          watchtime: video['watchtime'] as int,
-          creationDate: video['creation_date'] as String,
-          thumbnailPath: "imgs/thumbnail_${Random().nextInt(4) + 1}.jpg",
-        );
-      }).toList();
-
-      setState(() {
-        videos = loadedVideos;
-        isLoading = false;
-      });
-    } catch (e) {
-      setState(() {
-        errorMessage = 'Error loading videos: $e';
-        isLoading = false;
-      });
-    }
-  }
+  final Set<String> expandedVideos = {};
+  final Random _random = Random();
 
   String _formatNumber(int number) {
     if (number >= 1000000) {
@@ -163,20 +212,6 @@ class _VideoListWidgetState extends State<VideoListWidget> {
         const baseColor = Color.fromARGB(255, 241, 241, 241);
         final hoverColor = baseColor.withOpacity(0.94);
 
-        if (isLoading) {
-          return const Center(child: CircularProgressIndicator());
-        }
-
-        if (errorMessage.isNotEmpty) {
-          return Center(
-              child: Text(errorMessage,
-                  style: const TextStyle(color: Colors.red)));
-        }
-
-        if (videos.isEmpty) {
-          return const Center(child: Text('No videos found for this user'));
-        }
-
         List<Widget> contentWidgets = [];
 
         contentWidgets.add(
@@ -200,23 +235,23 @@ class _VideoListWidgetState extends State<VideoListWidget> {
                   Expanded(
                     child: AnalyticsCard(
                       title: 'Impressions',
-                      value: '1.2M',
+                      value: impressions,
                       icon: Icons.trending_up,
                     ),
                   ),
-                  SizedBox(width: 16),
+                  const SizedBox(width: 16),
                   Expanded(
                     child: AnalyticsCard(
                       title: 'Click Through Rate',
-                      value: '39%',
+                      value: ctr,
                       icon: Icons.bar_chart,
                     ),
                   ),
-                  SizedBox(width: 16),
+                  const SizedBox(width: 16),
                   Expanded(
                     child: AnalyticsCard(
                       title: 'Comments',
-                      value: '45.3K',
+                      value: commentsTotal,
                       icon: Icons.comment,
                     ),
                   ),
@@ -236,121 +271,150 @@ class _VideoListWidgetState extends State<VideoListWidget> {
           ),
         );
 
-        for (int i = 0; i < videos.length; i++) {
-          final video = videos[i];
-
+        for (var video in videos) {
           contentWidgets.add(
-            Container(
-              margin: EdgeInsets.symmetric(vertical: spacing / 2),
-              padding: videoPadding,
-              decoration: BoxDecoration(
-                color: Colors.white,
-                border: Border.all(
-                    color: const Color.fromARGB(255, 0, 0, 0), width: 2),
-                borderRadius: BorderRadius.circular(borderRadius),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.grey.withOpacity(0.08),
-                    blurRadius: 3,
-                    offset: const Offset(0, 1.5),
-                  ),
-                ],
-              ),
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
+            GestureDetector(
+              onTap: () {
+                setState(() {
+                  if (expandedVideos.contains(video.videoId)) {
+                    expandedVideos.remove(video.videoId);
+                  } else {
+                    expandedVideos.add(video.videoId);
+                  }
+                });
+              },
+              child: Column(
                 children: [
-                  // LEFT SIDE
-                  Expanded(
-                    flex: 2,
+                  Container(
+                    margin: EdgeInsets.symmetric(vertical: spacing / 2),
+                    padding: videoPadding,
+                    decoration: BoxDecoration(
+                      color: Color.fromARGB(255, 211, 233, 255)   ,
+                      border: Border.all(color: Colors.black, width: 2),
+                      borderRadius: BorderRadius.circular(borderRadius),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.grey.withOpacity(0.08),
+                          blurRadius: 3,
+                          offset: const Offset(0, 1.5),
+                        ),
+                      ],
+                    ),
                     child: Row(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Image.asset(
-                          video.thumbnailPath,
-                          fit: BoxFit.cover,
-                          height: imageHeight,
-                          width: imageHeight * 1.6,
-                          errorBuilder: (context, error, stackTrace) {
-                            return Container(
-                              height: imageHeight,
-                              width: imageHeight * 1.6,
-                              color: Colors.grey,
-                              child: const Icon(Icons.video_library,
-                                  color: Colors.white),
-                            );
-                          },
-                        ),
-                        SizedBox(width: spacing),
+                        // LEFT SIDE
                         Expanded(
-                          child: Column(
+                          flex: 2,
+                          child: Row(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text(
-                                video.videoName,
-                                style: TextStyle(
-                                  fontSize: nameFontSize,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.black87,
+                              Image.asset(
+                                video.thumbnailPath,
+                                fit: BoxFit.cover,
+                                height: imageHeight,
+                                width: imageHeight * 1.6,
+                                errorBuilder: (context, error, stackTrace) {
+                                  return Container(
+                                    height: imageHeight,
+                                    width: imageHeight * 1.6,
+                                    color: Colors.grey,
+                                    child: const Icon(Icons.video_library,
+                                        color: Color.fromARGB(255, 211, 233, 255)   ,)
+                                  );
+                                },
+                              ),
+                              SizedBox(width: spacing),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      video.videoName,
+                                      style: TextStyle(
+                                        fontSize: nameFontSize,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.black87,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 12),
+                                    Wrap(
+                                      runSpacing: 8,
+                                      spacing: 20,
+                                      children: [
+                                        _infoItem(
+                                          Icons.date_range,
+                                          DateFormat('yyyy-MM-dd').format(
+                                              DateTime.parse(
+                                                  video.creationDate)),
+                                          dateFontSize,
+                                        ),
+                                        _infoItem(
+                                            Icons.visibility,
+                                            _formatNumber(video.views),
+                                            dateFontSize),
+                                        _infoItem(
+                                            Icons.comment,
+                                            _formatNumber(video.comments),
+                                            dateFontSize),
+                                        _infoItem(
+                                            Icons.attach_money,
+                                            '\$${video.revenue.toStringAsFixed(2)}',
+                                            dateFontSize),
+                                        _infoItem(
+                                            Icons.access_time,
+                                            _formatWatchTime(video.watchtime),
+                                            dateFontSize),
+                                      ],
+                                    ),
+                                  ],
                                 ),
                               ),
-                              const SizedBox(height: 12),
-                              Wrap(
-                                runSpacing: 8,
-                                spacing: 20,
-                                children: [
-                                  _infoItem(
-                                      Icons.date_range,
-                                      DateFormat('yyyy-MM-dd').format(
-                                          DateTime.parse(video.creationDate)),
-                                      dateFontSize),
-                                  _infoItem(Icons.visibility,
-                                      _formatNumber(video.views), dateFontSize),
-                                  _infoItem(Icons.comment,
-                                      _formatNumber(video.comments), dateFontSize),
-                                  _infoItem(
-                                      Icons.attach_money,
-                                      '\$${video.revenue.toStringAsFixed(2)}',
-                                      dateFontSize),
-                                  _infoItem(Icons.access_time,
-                                      _formatWatchTime(video.watchtime), dateFontSize),
-                                ],
-                              ),
                             ],
+                          ),
+                        ),
+                        SizedBox(width: spacing * 2), // Extra spacing
+
+                        // RIGHT SIDE
+                        Flexible(
+                          flex: 2,
+                          child: Padding(
+                            padding: const EdgeInsets.only(left: 8.0),
+                            child: Row(
+                              children: [
+                                Expanded(
+                                  child: AnalyticsCard(
+                                    title: 'Impressions',
+                                    value: '${90000}',
+                                    icon: Icons.trending_up,
+                                  ),
+                                ),
+                                SizedBox(width: 12),
+                                Expanded(
+                                  child: AnalyticsCard(
+                                    title: 'CTR',
+                                    value:
+                                        '${( 20 + 20).toStringAsFixed(1)}%',
+                                    icon: Icons.bar_chart,
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
                         ),
                       ],
                     ),
                   ),
-
-                  SizedBox(width: spacing * 2), // Extra spacing
-
-                  // RIGHT SIDE
-                  Flexible(
-                    flex: 2,
-                    child: Padding(
-                      padding: const EdgeInsets.only(left: 8.0),
-                      child: Row(
+                  if (expandedVideos.contains(video.videoId))
+                    Padding(
+                      padding:
+                          const EdgeInsets.only(top: 12.0, bottom: 20.0),
+                      child: Column(
                         children: [
-                          Expanded(
-                            child: AnalyticsCard(
-                              title: 'Impressions',
-                              value: '${Random().nextInt(9000) + 1000}',
-                              icon: Icons.trending_up,
-                            ),
-                          ),
-                          SizedBox(width: 12),
-                          Expanded(
-                            child: AnalyticsCard(
-                              title: 'CTR',
-                              value:
-                                  '${(Random().nextDouble() * 20 + 20).toStringAsFixed(1)}%',
-                              icon: Icons.bar_chart,
-                            ),
-                          ),
+                          overview_graphs(context), // Show graphs here
                         ],
                       ),
                     ),
-                  ),
                 ],
               ),
             ),
@@ -358,12 +422,12 @@ class _VideoListWidgetState extends State<VideoListWidget> {
         }
 
         return MouseRegion(
-          onEnter: (_) => setState(() => isHovered = true),
-          onExit: (_) => setState(() => isHovered = false),
+          onEnter: (_) => setState(() {}),
+          onExit: (_) => setState(() {}),
           child: Container(
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: isHovered ? hoverColor : baseColor,
+              color: baseColor,
               borderRadius: BorderRadius.circular(16),
               border: Border.all(color: Colors.brown.shade300, width: 2),
             ),
@@ -384,7 +448,7 @@ class _VideoListWidgetState extends State<VideoListWidget> {
       mainAxisSize: MainAxisSize.min,
       children: [
         Icon(icon, size: 16, color: Colors.grey[600]),
-        SizedBox(width: 6),
+        const SizedBox(width: 6),
         Text(
           value,
           style: TextStyle(
