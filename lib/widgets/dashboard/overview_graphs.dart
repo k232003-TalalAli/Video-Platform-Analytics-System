@@ -36,10 +36,10 @@ Widget overview_graphs(BuildContext context) {
   List<int> views3 = generateRandomList(totalDays, 500);
   List<int> views4 = generateRandomList(totalDays, 90);
 
-  List<String>  dates1 = generateRandomDates(totalDays);
-  List<String>  dates2 = generateRandomDates(totalDays);
-  List<String>  dates3 = generateRandomDates(totalDays);
-  List<String>  dates4 = generateRandomDates(totalDays);
+  List<String> dates1 = generateRandomDates(totalDays);
+  List<String> dates2 = generateRandomDates(totalDays);
+  List<String> dates3 = generateRandomDates(totalDays);
+  List<String> dates4 = generateRandomDates(totalDays);
 
   double chartHeight = MediaQuery.of(context).size.height > 600 ? 300 : 200;
 
@@ -50,9 +50,11 @@ Widget overview_graphs(BuildContext context) {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            buildLineChart(totalDays, views1,dates1, "Date", "Views", "Views", chartHeight),
+            buildLineChart(totalDays, views1, dates1, "Date", "Views", "Views",
+                chartHeight),
             const SizedBox(height: 24),
-            buildLineChart(totalDays, views3, dates2, "Date", "Wt (hrs)", "Watch Time", chartHeight),
+            buildLineChart(totalDays, views3, dates2, "Date", "Wt (hrs)",
+                "Watch Time", chartHeight),
           ],
         ),
       ),
@@ -61,9 +63,11 @@ Widget overview_graphs(BuildContext context) {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            buildLineChart(totalDays, views2, dates3, "Date", "Subscribers", "Subscribers", chartHeight),
+            buildLineChart(totalDays, views2, dates3, "Date", "Subscribers",
+                "Subscribers", chartHeight),
             const SizedBox(height: 24),
-            buildLineChart(totalDays, views4, dates4, "Date", "\$ Earned", "Estimated Revenue", chartHeight),
+            buildLineChart(totalDays, views4, dates4, "Date", "\$ Earned",
+                "Estimated Revenue", chartHeight),
           ],
         ),
       ),
@@ -79,11 +83,8 @@ class TopVideosWidget extends StatefulWidget {
   final String? userId;
 
   const TopVideosWidget(
-    this.channelName, 
-    this.channelDescription, 
-    this.profileImageUrl, 
-    {super.key, this.userId}
-  );
+      this.channelName, this.channelDescription, this.profileImageUrl,
+      {super.key, this.userId});
 
   @override
   State<TopVideosWidget> createState() => _TopVideosWidgetState();
@@ -96,7 +97,9 @@ class _TopVideosWidgetState extends State<TopVideosWidget> {
   @override
   void initState() {
     super.initState();
-    _userId = widget.userId ?? UserSession().currentUserId ?? 'b4fc101f-a404-49e3-a7f7-4f83bc0e38e8';
+    _userId = widget.userId ??
+        UserSession().currentUserId ??
+        'b4fc101f-a404-49e3-a7f7-4f83bc0e38e8';
   }
 
   void onTopVideosTap() {
@@ -155,12 +158,11 @@ class _TopVideosWidgetState extends State<TopVideosWidget> {
       "2025-04-05",
     ];
 
-    
-    String commentsRevHardcoded="100";
-    String watchTime="100 hrs";
-    String Views="120K";
+    String commentsRevHardcoded = "100";
+    String watchTime = "100 hrs";
+    String Views = "120K";
 
-      //HARDCODED VALUES END --------------------------------------------------------------------------------------------------
+    //HARDCODED VALUES END --------------------------------------------------------------------------------------------------
 
     List<Widget> imgWidgets = [];
 
@@ -169,7 +171,8 @@ class _TopVideosWidgetState extends State<TopVideosWidget> {
         padding: const EdgeInsets.only(bottom: 16.0),
         child: Text(
           "Top Videos",
-          style: TextStyle(fontSize: nameFontSize + 4, fontWeight: FontWeight.bold),
+          style: TextStyle(
+              fontSize: nameFontSize + 4, fontWeight: FontWeight.bold),
         ),
       ),
     );
@@ -194,62 +197,67 @@ class _TopVideosWidgetState extends State<TopVideosWidget> {
                   children: [
                     Text(
                       imgNames[i],
-                      style: TextStyle(fontSize: nameFontSize, fontWeight: FontWeight.bold),
+                      style: TextStyle(
+                          fontSize: nameFontSize, fontWeight: FontWeight.bold),
                     ),
                     const SizedBox(height: 4),
                     Row(
-                            children: [
-                              Icon(Icons.date_range, size: 16, color: Colors.grey[600]),
-                              const SizedBox(width: 6),
-                              Text(
-                                imgDates[i],
-                                style: TextStyle(
-                                  fontSize: dateFontSize,
-                                  color: Colors.grey[600],
-                                ),
-                              ),
-                              const SizedBox(width: 30), // More horizontal space
-                              Icon(Icons.visibility, size: 16, color: Colors.grey[600]),
-                              const SizedBox(width: 6),
-                              Text(
-                                Views,
-                                style: TextStyle(
-                                  fontSize: dateFontSize,
-                                  color: Colors.grey[600],
-                                ),
-                              ),
-                              const SizedBox(width: 30),
-                              Icon(Icons.comment, size: 16, color: Colors.grey[600]),
-                              const SizedBox(width: 6),
-                              Text(
-                               commentsRevHardcoded,
-                                style: TextStyle(
-                                  fontSize: dateFontSize,
-                                  color: Colors.grey[600],
-                                ),
-                              ),
-                              const SizedBox(width: 30),
-                              Icon(Icons.attach_money, size: 16, color: Colors.grey[600]),
-                              const SizedBox(width: 6),
-                              Text(
-                              commentsRevHardcoded,
-                                style: TextStyle(
-                                  fontSize: dateFontSize,
-                                  color: Colors.grey[600],
-                                ),
-                              ),
-                              const SizedBox(width: 30),
-                              Icon(Icons.access_time, size: 16, color: Colors.grey[600]),
-                              const SizedBox(width: 6),
-                              Text(
-                                watchTime,
-                                style: TextStyle(
-                                  fontSize: dateFontSize,
-                                  color: Colors.grey[600],
-                                ),
-                              ),
-                            ],
+                      children: [
+                        Icon(Icons.date_range,
+                            size: 16, color: Colors.grey[600]),
+                        const SizedBox(width: 6),
+                        Text(
+                          imgDates[i],
+                          style: TextStyle(
+                            fontSize: dateFontSize,
+                            color: Colors.grey[600],
                           ),
+                        ),
+                        const SizedBox(width: 30), // More horizontal space
+                        Icon(Icons.visibility,
+                            size: 16, color: Colors.grey[600]),
+                        const SizedBox(width: 6),
+                        Text(
+                          Views,
+                          style: TextStyle(
+                            fontSize: dateFontSize,
+                            color: Colors.grey[600],
+                          ),
+                        ),
+                        const SizedBox(width: 30),
+                        Icon(Icons.comment, size: 16, color: Colors.grey[600]),
+                        const SizedBox(width: 6),
+                        Text(
+                          commentsRevHardcoded,
+                          style: TextStyle(
+                            fontSize: dateFontSize,
+                            color: Colors.grey[600],
+                          ),
+                        ),
+                        const SizedBox(width: 30),
+                        Icon(Icons.attach_money,
+                            size: 16, color: Colors.grey[600]),
+                        const SizedBox(width: 6),
+                        Text(
+                          commentsRevHardcoded,
+                          style: TextStyle(
+                            fontSize: dateFontSize,
+                            color: Colors.grey[600],
+                          ),
+                        ),
+                        const SizedBox(width: 30),
+                        Icon(Icons.access_time,
+                            size: 16, color: Colors.grey[600]),
+                        const SizedBox(width: 6),
+                        Text(
+                          watchTime,
+                          style: TextStyle(
+                            fontSize: dateFontSize,
+                            color: Colors.grey[600],
+                          ),
+                        ),
+                      ],
+                    ),
                   ],
                 ),
               ),
@@ -290,28 +298,36 @@ class _TopVideosWidgetState extends State<TopVideosWidget> {
   }
 }
 
-Widget over_view_widget(String channelName, String channelDescription, String profileImageUrl, {String? userId}) {
+Widget over_view_widget(
+    String channelName, String channelDescription, String profileImageUrl,
+    {String? userId}) {
   return LayoutBuilder(
     builder: (context, constraints) {
       bool isWideScreen = constraints.maxWidth > 800;
 
       return SingleChildScrollView(
         child: Padding(
-          padding: const EdgeInsets.only(top: 16.0, right: 16.0, bottom: 16.0), // Removed left padding
+          padding: const EdgeInsets.only(
+              top: 16.0, right: 16.0, bottom: 16.0), // Removed left padding
           child: isWideScreen
               ? Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Expanded(child: overview_graphs(context)),
                     const SizedBox(width: 32),
-                    Expanded(child: TopVideosWidget(channelName, channelDescription, profileImageUrl, userId: userId)),
+                    Expanded(
+                        child: TopVideosWidget(
+                            channelName, channelDescription, profileImageUrl,
+                            userId: userId)),
                   ],
                 )
               : Column(
                   children: [
                     overview_graphs(context),
                     const SizedBox(height: 32),
-                    TopVideosWidget(channelName, channelDescription, profileImageUrl, userId: userId),
+                    TopVideosWidget(
+                        channelName, channelDescription, profileImageUrl,
+                        userId: userId),
                   ],
                 ),
         ),
