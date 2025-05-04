@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import '../widgets/custom_app_bar.dart';
 import '../widgets/custom_drawer.dart';
 import '../widgets/feedback/feedback_widget.dart';
+import 'dashboard_screen.dart';
+
 
 class FeedbackScreen extends StatefulWidget {
   final String channelName;
@@ -66,7 +68,7 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
         onProfileUpdate: _handleProfileUpdate,
       ),
       drawerEdgeDragWidth: 0,
-      body: VideoListWidget(userId: widget.userId),
+      body: VideoListWidget(userId: widget.userId, totalComments: Userdata().totalComments, CreationDate: Userdata().channelCreationDate.toString()),
     );
   }
 } 

@@ -3,11 +3,8 @@ import 'dart:math';
 import 'package:intl/intl.dart';
 import '../dashboard/analytics_card.dart';
 import '../dashboard/line_graph.dart';
-
-List<int> generateRandomList(int numberOfValues, int max) {
-  final random = Random();
-  return List<int>.generate(numberOfValues, (_) => random.nextInt(max + 1));
-}
+import '../dashboard/overview_graphs.dart';
+import '../../../DB/API/Widget_database_utility.dart';
 
 List<String> Get_dates_onwards(String startDateStr) {
   final DateFormat formatter = DateFormat('yyyy-MM-dd');
@@ -20,13 +17,12 @@ List<String> Get_dates_onwards(String startDateStr) {
   return sequentialDates;
 }
 
-Widget overview_graphs(BuildContext context) {
+Widget overview_graphs(BuildContext context, String CreationDate, int video_index) {
   int totalDays = 30;
-  List<int> CTR = generateRandomList(totalDays, 5000);
-  List<int> impressions = generateRandomList(totalDays, 134);
+  List<int> CTR = getDailyCTRForVideo(video_index);
+  List<int> impressions = getDailyImpressionsForVideo(video_index);
 
-  List<String> dates1 = Get_dates_onwards("2024-10-23");
-  List<String> dates2 = Get_dates_onwards("2024-10-23");
+  List<String> dates = Get_dates_onwards(CreationDate);
 
   double chartHeight = MediaQuery.of(context).size.height > 600 ? 300 : 200;
   double chartWidth = MediaQuery.of(context).size.width * 0.4; // adjust as needed
@@ -36,7 +32,7 @@ Widget overview_graphs(BuildContext context) {
     decoration: BoxDecoration(
       border: Border.all(color: Colors.black87, width: 2),
       borderRadius: BorderRadius.circular(12),
-      color: Color.fromARGB(255, 175, 215, 255)   ,
+      color: Color.fromARGB(255, 175, 215, 255),
     ),
     child: Row(
       mainAxisAlignment: MainAxisAlignment.center, // Center graphs horizontally
@@ -45,120 +41,58 @@ Widget overview_graphs(BuildContext context) {
         SizedBox(
           width: chartWidth,
           child: buildLineChart(
-              totalDays, CTR, dates1, "Day", "CTR", "CTR", chartHeight),
+            totalDays,
+            CTR,
+            dates,
+            "Day",
+            "CTR (%)",
+            "CTR",
+            chartHeight,
+          ),
         ),
         const SizedBox(width: 16), // Space between graphs
         SizedBox(
           width: chartWidth,
-          child: buildLineChart(totalDays, impressions, dates2, "Day",
-              "Impressions", "Impressions", chartHeight),
+          child: buildLineChart(
+            totalDays,
+            impressions,
+            dates,
+            "Day",
+            "Impressions",
+            "Impressions",
+            chartHeight,
+          ),
         ),
       ],
     ),
   );
 }
 
-
-
 class VideoListWidget extends StatefulWidget {
   final String? userId;
+  final String CreationDate;
+  final int totalComments;
 
   const VideoListWidget({
     super.key,
     this.userId,
+    required this.totalComments,
+    required this.CreationDate,
   });
 
   @override
   State<VideoListWidget> createState() => _VideoListWidgetState();
 }
 
-class VideoData {
-  final String videoId;
-  final String videoName;
-  final int views;
-  final int subscribers;
-  final double revenue;
-  final int comments;
-  final int watchtime;
-  final String creationDate;
-  final String thumbnailPath;
-
-  VideoData({
-    required this.videoId,
-    required this.videoName,
-    required this.views,
-    required this.subscribers,
-    required this.revenue,
-    required this.comments,
-    required this.watchtime,
-    required this.creationDate,
-    this.thumbnailPath = "imgs/thumbnail_1.jpg",
-  });
-}
+List<String> imgPaths = [
+  "imgs/thumbnail_1.jpg",
+  "imgs/thumbnail_2.jpg",
+  "imgs/thumbnail_3.jpg",
+  "imgs/thumbnail_4.jpg",
+  "imgs/thumbnail_3.jpg",
+];
 
 class _VideoListWidgetState extends State<VideoListWidget> {
-  final String impressions = '1.2M';
-  final String ctr = '39%';
-  final String commentsTotal = '45.3K';
-
-  final List<VideoData> videos = [
-    VideoData(
-      videoId: 'vid1',
-      videoName: 'Flutter Tutorial - Beginner to Advanced',
-      views: 120000,
-      subscribers: 1500,
-      revenue: 230.50,
-      comments: 230,
-      watchtime: 12400,
-      creationDate: '2024-05-01',
-      thumbnailPath: 'imgs/thumbnail_1.jpg',
-    ),
-    VideoData(
-      videoId: 'vid2',
-      videoName: 'Building a Chat App with Firebase',
-      views: 85000,
-      subscribers: 1100,
-      revenue: 180.00,
-      comments: 190,
-      watchtime: 9800,
-      creationDate: '2024-05-10',
-      thumbnailPath: 'imgs/thumbnail_2.jpg',
-    ),
-    VideoData(
-      videoId: 'vid3',
-      videoName: 'Dart Tips and Tricks',
-      views: 43000,
-      subscribers: 700,
-      revenue: 95.75,
-      comments: 85,
-      watchtime: 5400,
-      creationDate: '2024-05-15',
-      thumbnailPath: 'imgs/thumbnail_3.jpg',
-    ),
-    VideoData(
-      videoId: 'vid4',
-      videoName: 'State Management with Provider',
-      views: 67000,
-      subscribers: 950,
-      revenue: 142.25,
-      comments: 178,
-      watchtime: 8200,
-      creationDate: '2024-04-28',
-      thumbnailPath: 'imgs/thumbnail_1.jpg',
-    ),
-    VideoData(
-      videoId: 'vid5',
-      videoName: 'Creating Beautiful UI Animations',
-      views: 93500,
-      subscribers: 1250,
-      revenue: 197.80,
-      comments: 210,
-      watchtime: 10700,
-      creationDate: '2024-04-20',
-      thumbnailPath: 'imgs/thumbnail_1.jpg',
-    ),
-  ];
-
   final Set<String> expandedVideos = {};
   final Random _random = Random();
 
@@ -235,7 +169,7 @@ class _VideoListWidgetState extends State<VideoListWidget> {
                   Expanded(
                     child: AnalyticsCard(
                       title: 'Impressions',
-                      value: impressions,
+                      value: _formatNumber(calculateTotalImpressions()),
                       icon: Icons.trending_up,
                     ),
                   ),
@@ -243,7 +177,7 @@ class _VideoListWidgetState extends State<VideoListWidget> {
                   Expanded(
                     child: AnalyticsCard(
                       title: 'Click Through Rate',
-                      value: ctr,
+                      value: calculateChannelCTR().toString() + "%",
                       icon: Icons.bar_chart,
                     ),
                   ),
@@ -251,7 +185,7 @@ class _VideoListWidgetState extends State<VideoListWidget> {
                   Expanded(
                     child: AnalyticsCard(
                       title: 'Comments',
-                      value: commentsTotal,
+                      value: NumberFormat.compact().format(widget.totalComments),
                       icon: Icons.comment,
                     ),
                   ),
@@ -271,15 +205,18 @@ class _VideoListWidgetState extends State<VideoListWidget> {
           ),
         );
 
-        for (var video in videos) {
+        int index = -1;
+        for (int i = 0; i < imgPaths.length; i++) {
+          index++;
           contentWidgets.add(
             GestureDetector(
               onTap: () {
                 setState(() {
-                  if (expandedVideos.contains(video.videoId)) {
-                    expandedVideos.remove(video.videoId);
+                  String videoId = Videos().videoList[i].videoId;
+                  if (expandedVideos.contains(videoId)) {
+                    expandedVideos.remove(videoId);
                   } else {
-                    expandedVideos.add(video.videoId);
+                    expandedVideos.add(videoId);
                   }
                 });
               },
@@ -289,7 +226,7 @@ class _VideoListWidgetState extends State<VideoListWidget> {
                     margin: EdgeInsets.symmetric(vertical: spacing / 2),
                     padding: videoPadding,
                     decoration: BoxDecoration(
-                      color: Color.fromARGB(255, 211, 233, 255)   ,
+                      color: Color.fromARGB(255, 211, 233, 255),
                       border: Border.all(color: Colors.black, width: 2),
                       borderRadius: BorderRadius.circular(borderRadius),
                       boxShadow: [
@@ -310,7 +247,7 @@ class _VideoListWidgetState extends State<VideoListWidget> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Image.asset(
-                                video.thumbnailPath,
+                                imgPaths[i],
                                 fit: BoxFit.cover,
                                 height: imageHeight,
                                 width: imageHeight * 1.6,
@@ -319,8 +256,10 @@ class _VideoListWidgetState extends State<VideoListWidget> {
                                     height: imageHeight,
                                     width: imageHeight * 1.6,
                                     color: Colors.grey,
-                                    child: const Icon(Icons.video_library,
-                                        color: Color.fromARGB(255, 211, 233, 255)   ,)
+                                    child: const Icon(
+                                      Icons.video_library,
+                                      color: Color.fromARGB(255, 211, 233, 255),
+                                    ),
                                   );
                                 },
                               ),
@@ -330,7 +269,7 @@ class _VideoListWidgetState extends State<VideoListWidget> {
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Text(
-                                      video.videoName,
+                                      Videos().videoList[i].videoName,
                                       style: TextStyle(
                                         fontSize: nameFontSize,
                                         fontWeight: FontWeight.bold,
@@ -344,27 +283,44 @@ class _VideoListWidgetState extends State<VideoListWidget> {
                                       children: [
                                         _infoItem(
                                           Icons.date_range,
-                                          DateFormat('yyyy-MM-dd').format(
-                                              DateTime.parse(
-                                                  video.creationDate)),
+                                          Format_date(Videos()
+                                              .videoList[i]
+                                              .creationDate
+                                              .toString()),
                                           dateFontSize,
                                         ),
                                         _infoItem(
-                                            Icons.visibility,
-                                            _formatNumber(video.views),
-                                            dateFontSize),
+                                          Icons.visibility,
+                                          _formatNumber(Videos()
+                                              .videoList[i]
+                                              .views)
+                                              .toString(),
+                                          dateFontSize,
+                                        ),
                                         _infoItem(
-                                            Icons.comment,
-                                            _formatNumber(video.comments),
-                                            dateFontSize),
+                                          Icons.comment,
+                                          _formatNumber(Videos()
+                                              .videoList[i]
+                                              .comments)
+                                              .toString(),
+                                          dateFontSize,
+                                        ),
                                         _infoItem(
-                                            Icons.attach_money,
-                                            '\$${video.revenue.toStringAsFixed(2)}',
-                                            dateFontSize),
+                                          Icons.attach_money,
+                                          Videos()
+                                              .videoList[i]
+                                              .revenue
+                                              .toString(),
+                                          dateFontSize,
+                                        ),
                                         _infoItem(
-                                            Icons.access_time,
-                                            _formatWatchTime(video.watchtime),
-                                            dateFontSize),
+                                          Icons.access_time,
+                                          _formatWatchTime(Videos()
+                                                  .videoList[i]
+                                                  .watchtime)
+                                              .toString(),
+                                          dateFontSize,
+                                        ),
                                       ],
                                     ),
                                   ],
@@ -373,8 +329,7 @@ class _VideoListWidgetState extends State<VideoListWidget> {
                             ],
                           ),
                         ),
-                        SizedBox(width: spacing * 2), // Extra spacing
-
+                        SizedBox(width: spacing * 2),
                         // RIGHT SIDE
                         Flexible(
                           flex: 2,
@@ -385,7 +340,8 @@ class _VideoListWidgetState extends State<VideoListWidget> {
                                 Expanded(
                                   child: AnalyticsCard(
                                     title: 'Impressions',
-                                    value: '${90000}',
+                                    value: _formatNumber(
+                                        sumTotalImpressionsForVideo(index)),
                                     icon: Icons.trending_up,
                                   ),
                                 ),
@@ -393,8 +349,8 @@ class _VideoListWidgetState extends State<VideoListWidget> {
                                 Expanded(
                                   child: AnalyticsCard(
                                     title: 'CTR',
-                                    value:
-                                        '${( 20 + 20).toStringAsFixed(1)}%',
+                                    value: calculateVideoCTR(index).toString() +
+                                        "%",
                                     icon: Icons.bar_chart,
                                   ),
                                 ),
@@ -405,13 +361,12 @@ class _VideoListWidgetState extends State<VideoListWidget> {
                       ],
                     ),
                   ),
-                  if (expandedVideos.contains(video.videoId))
+                  if (expandedVideos.contains(Videos().videoList[i].videoId))
                     Padding(
-                      padding:
-                          const EdgeInsets.only(top: 12.0, bottom: 20.0),
+                      padding: const EdgeInsets.only(top: 12.0, bottom: 20.0),
                       child: Column(
                         children: [
-                          overview_graphs(context), // Show graphs here
+                          overview_graphs(context, widget.CreationDate, index), // Show graphs here
                         ],
                       ),
                     ),
