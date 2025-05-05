@@ -121,6 +121,11 @@ class _TopVideosWidgetState extends State<TopVideosWidget> {
     const baseColor = Color.fromARGB(255, 241, 241, 241);
     final hoverColor = baseColor.withOpacity(0.94);
 
+    if (!Videos()._isInitialized) {
+    return const Center(child: CircularProgressIndicator());
+  }
+
+
     //HARDCODED VALUES --------------------------------------------------------------------------------------------------
 
     List<String> imgPaths = [
@@ -343,9 +348,24 @@ Widget overview_graphs(BuildContext context, String CreationDate) {
 Widget over_view_widget(String channelName, String channelDescription,
     String profileImageUrl, String CreationDate,
     {String? userId}) {
-  return LayoutBuilder(
-    builder: (context, constraints) {
-      bool isWideScreen = constraints.maxWidth > 800;
+  final String _userId = userId ?? UserSession().currentUserId ?? 'fallback-id';
+
+  Future<void> loadEverything() async {
+    await Videos().initialize(_userId);
+    final videoIds = Videos().videoList.map((v) => v.videoId).toList();
+    if (videoIds.length == 5) {
+      await Metrics().loadMetrics(videoIds);
+    }
+  }
+
+  return FutureBuilder(
+    future: loadEverything(),
+    builder: (context, snapshot) {
+      if (snapshot.connectionState != ConnectionState.done) {
+        return const Center(child: CircularProgressIndicator());
+      }
+
+      bool isWideScreen = MediaQuery.of(context).size.width > 800;
 
       return SingleChildScrollView(
         child: Padding(
@@ -360,7 +380,7 @@ Widget over_view_widget(String channelName, String channelDescription,
                     Expanded(
                         child: TopVideosWidget(
                             channelName, channelDescription, profileImageUrl,
-                            userId: userId)),
+                            userId: _userId)),
                   ],
                 )
               : Column(
@@ -369,7 +389,7 @@ Widget over_view_widget(String channelName, String channelDescription,
                     const SizedBox(height: 32),
                     TopVideosWidget(
                         channelName, channelDescription, profileImageUrl,
-                        userId: userId),
+                        userId: _userId),
                   ],
                 ),
         ),
