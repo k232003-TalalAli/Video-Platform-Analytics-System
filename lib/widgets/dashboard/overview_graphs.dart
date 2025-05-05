@@ -73,25 +73,26 @@ class _TopVideosWidgetState extends State<TopVideosWidget> {
     _loadVideos(); // <-- initialize the Videos singleton
   }
 
- Future<void> _loadVideos() async {
-  try {
-    await Videos().initialize(_userId);
+  Future<void> _loadVideos() async {
+    try {
+      await Videos().initialize(_userId);
 
-    // Extract video IDs from the initialized video list
-    final videoIds = Videos().videoList.map((video) => video.videoId).toList();
+      // Extract video IDs from the initialized video list
+      final videoIds =
+          Videos().videoList.map((video) => video.videoId).toList();
 
-    // Ensure we pass exactly 5 videos (you already trimmed it earlier)
-    if (videoIds.length == 5) {
-      await Metrics().loadMetrics(videoIds);
-    } else {
-      throw Exception("Expected exactly 5 videos, got ${videoIds.length}");
+      // Ensure we pass exactly 5 videos (you already trimmed it earlier)
+      if (videoIds.length == 5) {
+        await Metrics().loadMetrics(videoIds);
+      } else {
+        throw Exception("Expected exactly 5 videos, got ${videoIds.length}");
+      }
+
+      setState(() {}); // Rebuild the widget after data is loaded
+    } catch (e) {
+      print('Error initializing videos and metrics: $e');
     }
-
-    setState(() {}); // Rebuild the widget after data is loaded
-  } catch (e) {
-    print('Error initializing videos and metrics: $e');
   }
-}
 
   void onTopVideosTap() {
     Navigator.pushReplacement(
@@ -220,7 +221,7 @@ class _TopVideosWidgetState extends State<TopVideosWidget> {
                             size: 16, color: Colors.grey[600]),
                         const SizedBox(width: 6),
                         Text(
-                           _formatWatchTime(Videos().videoList[i].watchtime),
+                          _formatWatchTime(Videos().videoList[i].watchtime),
                           style: TextStyle(
                             fontSize: dateFontSize,
                             color: Colors.grey[600],
@@ -267,6 +268,7 @@ class _TopVideosWidgetState extends State<TopVideosWidget> {
     );
   }
 }
+
 final numberFormatter = NumberFormat.compact();
 
 String Format_date(String Date) {
@@ -292,11 +294,11 @@ List<String> Get_dates_onwards(String startDateStr) {
 }
 
 String _formatWatchTime(int seconds) {
-    int hours = seconds ~/ 3600;
-    return '$hours hrs';
-  }
+  int hours = seconds ~/ 3600;
+  return '$hours hrs';
+}
 
-Widget overview_graphs(BuildContext context,String CreationDate) {
+Widget overview_graphs(BuildContext context, String CreationDate) {
   int totalDays = 30;
   List<int> views1 = sumDailyViews();
   List<int> watchTime = sumDailyWatchTime();
@@ -327,7 +329,7 @@ Widget overview_graphs(BuildContext context,String CreationDate) {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             buildLineChart(totalDays, watchTime, dates, "Date", "Impressions",
-                "Subscribers", chartHeight),
+                "Impressions", chartHeight),
             const SizedBox(height: 24),
             buildLineChart(totalDays, CTR, dates, "Date", "CTR (%)",
                 "Click-Through Rate", chartHeight),
@@ -338,8 +340,8 @@ Widget overview_graphs(BuildContext context,String CreationDate) {
   );
 }
 
-Widget over_view_widget(
-    String channelName, String channelDescription, String profileImageUrl, String CreationDate,
+Widget over_view_widget(String channelName, String channelDescription,
+    String profileImageUrl, String CreationDate,
     {String? userId}) {
   return LayoutBuilder(
     builder: (context, constraints) {
@@ -353,7 +355,7 @@ Widget over_view_widget(
               ? Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Expanded(child: overview_graphs(context,CreationDate)),
+                    Expanded(child: overview_graphs(context, CreationDate)),
                     const SizedBox(width: 32),
                     Expanded(
                         child: TopVideosWidget(
@@ -363,7 +365,7 @@ Widget over_view_widget(
                 )
               : Column(
                   children: [
-                    overview_graphs(context,CreationDate),
+                    overview_graphs(context, CreationDate),
                     const SizedBox(height: 32),
                     TopVideosWidget(
                         channelName, channelDescription, profileImageUrl,
@@ -375,4 +377,3 @@ Widget over_view_widget(
     },
   );
 }
-
