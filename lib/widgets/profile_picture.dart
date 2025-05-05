@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'dart:io';
+import '../theme/app_theme.dart';
 
 class ProfilePicture extends StatelessWidget {
   final String? imageUrl;
@@ -21,12 +22,12 @@ class ProfilePicture extends StatelessWidget {
       decoration: BoxDecoration(
         shape: BoxShape.circle,
         border: Border.all(
-          color: Colors.black,
+          color: AppTheme.primaryColor,
           width: 2,
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withAlpha(26),
+            color: AppTheme.primaryColor.withAlpha(40),
             blurRadius: 8,
             offset: const Offset(0, 4),
           ),
@@ -57,12 +58,12 @@ class ProfilePicture extends StatelessWidget {
   Widget _buildDefaultAvatar() {
     if (channelName != null && channelName!.isNotEmpty) {
       return Container(
-        color: Colors.grey[800],
+        color: AppTheme.darkSurfaceColor,
         child: Center(
           child: Text(
             channelName![0].toUpperCase(),
             style: TextStyle(
-              color: Colors.white,
+              color: AppTheme.surfaceColor,
               fontSize: size * 0.5,
               fontWeight: FontWeight.bold,
             ),
@@ -71,11 +72,11 @@ class ProfilePicture extends StatelessWidget {
       );
     }
     return Container(
-      color: Colors.grey[800],
+      color: AppTheme.darkSurfaceColor,
       child: Icon(
         Icons.person,
         size: size * 0.6,
-        color: Colors.white,
+        color: AppTheme.surfaceColor,
       ),
     );
   }

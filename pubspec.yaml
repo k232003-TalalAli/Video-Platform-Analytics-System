@@ -18,12 +18,13 @@ dependencies:
   cached_network_image: ^3.2.3
   intl: ^0.18.1
   image_picker: ^1.0.7
-  window_size: ^0.1.0
   sqflite: ^2.3.0
   sqflite_common_ffi: ^2.3.0
   path_provider: ^2.1.1
   path: ^1.8.3
   uuid: ^4.0.0
+  window_manager: ^0.4.3
+  window_size: ^0.1.0
 
 dev_dependencies:
   flutter_test:

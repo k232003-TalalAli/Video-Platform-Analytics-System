@@ -1,4 +1,5 @@
 import '../DB/controllers/database_helper.dart';
+import '../screens/dashboard_screen.dart';
 
 /// A class to manage user session information across the app
 class UserSession {
@@ -26,6 +27,9 @@ class UserSession {
   void clearSession() {
     _currentUserId = null;
     _currentUsername = null;
+    
+    // Reset the Userdata singleton
+    Userdata().reset();
   }
   
   /// Get user ID from username

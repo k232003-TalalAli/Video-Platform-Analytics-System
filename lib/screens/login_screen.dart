@@ -7,9 +7,9 @@ import '../login/login_database_helper.dart';
 import '../DB/repositories/user_repository.dart';
 import '../DB/models/user.dart';
 import '../login/user_session.dart';
+import '../theme/app_theme.dart';
 import 'package:uuid/uuid.dart';
 import 'dart:io';
-import 'package:window_size/window_size.dart';
 import 'dashboard_screen.dart';
 
 /// The main login/signup screen widget.
@@ -33,7 +33,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
   /// Handles user sign in by verifying credentials.
   ///
-  /// On success, expands the window and navigates to the dashboard.
+  /// On success, navigates to the dashboard.
   Future<void> _handleSignIn() async {
     final username = _usernameController.text.trim();
     final password = _passwordController.text;
@@ -51,22 +51,15 @@ class _LoginScreenState extends State<LoginScreen> {
         print('Warning: Could not find user ID for username: $username');
       }
 
-      // Expand window for main app on desktop
-      if (Platform.isWindows || Platform.isLinux || Platform.isMacOS) {
-        setWindowMinSize(const Size(1200, 800));
-        setWindowMaxSize(Size.infinite);
-        getCurrentScreen().then((screen) {
-          if (screen != null) {
-            setWindowFrame(screen.visibleFrame);
-          }
-        });
+      // Navigate to dashboard
+      if (mounted) {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (context) => const DashboardScreen(),
+          ),
+        );
       }
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(
-          builder: (context) => const DashboardScreen(),
-        ),
-      );
     }
   }
 
@@ -120,24 +113,17 @@ class _LoginScreenState extends State<LoginScreen> {
   /// Builds the login/signup UI with a cozy, warm color scheme.
   @override
   Widget build(BuildContext context) {
-    // Cozy, warm color scheme
-    const Color primaryColor = Color(0xFF8D5524); // Warm brown
-    const Color accentColor =
-        Color(0xFFFFA07A); // Light salmon (warm accent)
-    const Color bgColor = Color(0xFFF6E3C5); // Cozy warm tan background
-    const Color cardColor = Color(0xFFFFE0B2); // Light terracotta card
-
     return Scaffold(
-      backgroundColor: bgColor,
+      backgroundColor: const Color.fromARGB(255, 196, 215, 242), 
       body: Center(
         child: Container(
           padding: const EdgeInsets.all(32),
           decoration: BoxDecoration(
-            color: cardColor,
+            color: AppTheme.surfaceColor,
             borderRadius: BorderRadius.circular(24),
             boxShadow: [
               BoxShadow(
-                color: Colors.brown.withAlpha(20),
+                color: AppTheme.primaryColor.withAlpha(30),
                 blurRadius: 16,
                 offset: const Offset(0, 8),
               ),
@@ -150,20 +136,20 @@ class _LoginScreenState extends State<LoginScreen> {
               const SizedBox(height: 16),
               Text(
                 _isLogin ? 'Welcome Back' : 'Create Account',
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 28,
                   fontWeight: FontWeight.bold,
-                  color: primaryColor,
+                  color: AppTheme.primaryColor,
                 ),
               ),
               const SizedBox(height: 24),
-              const Align(
+              Align(
                 alignment: Alignment.centerLeft,
                 child: Text(
                   'Username',
                   style: TextStyle(
                     fontWeight: FontWeight.w600,
-                    color: primaryColor,
+                    color: AppTheme.primaryTextColor,
                   ),
                 ),
               ),
@@ -171,23 +157,23 @@ class _LoginScreenState extends State<LoginScreen> {
               TextField(
                 controller: _usernameController,
                 decoration: InputDecoration(
-                  prefixIcon: const Icon(Icons.person_outline, color: primaryColor),
+                  prefixIcon: Icon(Icons.person_outline, color: AppTheme.primaryColor),
                   hintText: 'Enter your username',
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
                   ),
                   filled: true,
-                  fillColor: bgColor,
+                  fillColor: AppTheme.backgroundColor,
                 ),
               ),
               const SizedBox(height: 18),
-              const Align(
+              Align(
                 alignment: Alignment.centerLeft,
                 child: Text(
                   'Password',
                   style: TextStyle(
                     fontWeight: FontWeight.w600,
-                    color: primaryColor,
+                    color: AppTheme.primaryTextColor,
                   ),
                 ),
               ),
@@ -196,19 +182,17 @@ class _LoginScreenState extends State<LoginScreen> {
                 controller: _passwordController,
                 obscureText: _obscurePassword,
                 decoration: InputDecoration(
-                  prefixIcon: const Icon(Icons.lock_outline, color: primaryColor),
+                  prefixIcon: Icon(Icons.lock_outline, color: AppTheme.primaryColor),
                   hintText: 'Enter your password',
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
                   ),
                   filled: true,
-                  fillColor: bgColor,
+                  fillColor: AppTheme.backgroundColor,
                   suffixIcon: IconButton(
                     icon: Icon(
-                      _obscurePassword
-                          ? Icons.visibility_off
-                          : Icons.visibility,
-                      color: primaryColor,
+                      _obscurePassword ? Icons.visibility : Icons.visibility_off,
+                      color: AppTheme.secondaryTextColor,
                     ),
                     onPressed: () {
                       setState(() {
@@ -218,62 +202,54 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                 ),
               ),
-              const SizedBox(height: 24),
-              if (_errorMessage != null)
-                Padding(
-                  padding: const EdgeInsets.only(bottom: 12),
-                  child: Text(
-                    _errorMessage!,
-                    style: TextStyle(color: Colors.red[700]),
+              if (_errorMessage != null) ...[
+                const SizedBox(height: 16),
+                Text(
+                  _errorMessage!,
+                  style: TextStyle(
+                    color: _errorMessage!.contains('created') 
+                        ? AppTheme.secondaryColor 
+                        : AppTheme.graphColors[3],
+                    fontWeight: FontWeight.w500,
                   ),
                 ),
-              SizedBox(
-                width: double.infinity,
-                height: 48,
-                child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: accentColor,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    elevation: 2,
+              ],
+              const SizedBox(height: 32),
+              ElevatedButton(
+                onPressed: _isLogin ? _handleSignIn : _handleSignUp,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppTheme.primaryColor,
+                  foregroundColor: AppTheme.surfaceColor,
+                  padding: const EdgeInsets.symmetric(vertical: 16),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
                   ),
-                  onPressed: _isLogin ? _handleSignIn : _handleSignUp,
-                  child: Text(
-                    _isLogin ? 'Sign in' : 'Sign up',
-                    style: const TextStyle(
-                        fontSize: 18,
-                        color: primaryColor,
-                        fontWeight: FontWeight.bold),
+                  minimumSize: const Size(double.infinity, 50),
+                ),
+                child: Text(
+                  _isLogin ? 'Sign In' : 'Sign Up',
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
                   ),
                 ),
               ),
-              const SizedBox(height: 18),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                    _isLogin
-                        ? "Don't have an account? "
-                        : 'Already have an account? ',
-                    style: const TextStyle(color: primaryColor),
-                  ),
-                  GestureDetector(
-                    onTap: () {
-                      setState(() {
-                        _isLogin = !_isLogin;
-                        _errorMessage = null;
-                      });
-                    },
-                    child: Text(
-                      _isLogin ? 'Sign up' : 'Sign in',
-                      style: const TextStyle(
-                        color: accentColor,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                ],
+              const SizedBox(height: 16),
+              TextButton(
+                onPressed: () {
+                  setState(() {
+                    _isLogin = !_isLogin;
+                    _errorMessage = null;
+                  });
+                },
+                style: TextButton.styleFrom(
+                  foregroundColor: AppTheme.primaryColor,
+                ),
+                child: Text(
+                  _isLogin
+                      ? 'Don\'t have an account? Sign Up'
+                      : 'Already have an account? Sign In',
+                ),
               ),
               const SizedBox(height: 8),
             ],

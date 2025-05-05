@@ -73,3 +73,49 @@ lib/
 ## License
 
 This project is licensed under the MIT License - see the LICENSE file for details.
+
+# Video Platform Analytics System
+
+## Color Theme
+
+The application uses a modern, professional color theme:
+
+### Primary Colors
+- **Primary**: `#3B82F6` (Bright blue) - Main actions, buttons, and highlighted elements
+- **Secondary**: `#10B981` (Emerald green) - Success states and growth indicators
+- **Accent**: `#F59E0B` (Amber) - Warnings and attention-grabbing elements
+
+### Background & Surface Colors
+- **Background**: `#F9FAFB` (Off-white) - Main app background
+- **Surface**: `#FFFFFF` (White) - Cards, dialogs, modals
+- **Dark Surface**: `#1F2937` (Dark slate) - For dark mode or contrasting elements
+
+### Text Colors
+- **Primary Text**: `#111827` (Near black) - Main text
+- **Secondary Text**: `#6B7280` (Medium gray) - Less important text
+- **Disabled**: `#D1D5DB` (Light gray) - Inactive elements
+
+### Graph Colors
+- **Data Series 1**: `#3B82F6` (Blue)
+- **Data Series 2**: `#10B981` (Green)
+- **Data Series 3**: `#F59E0B` (Amber)
+- **Data Series 4**: `#EF4444` (Red)
+- **Data Series 5**: `#8B5CF6` (Purple)
+
+## Development
+
+The theme is implemented using Flutter's theming system. The theme configuration is stored in `lib/theme/app_theme.dart`.
+
+To modify the theme:
+1. Edit the color values in `lib/theme/app_theme.dart`
+2. Rebuild the application to see changes
+
+For custom widgets that need theme colors, import the theme file:
+```dart
+import '../theme/app_theme.dart';
+```
+
+And use the color constants:
+```dart
+Color myColor = AppTheme.primaryColor;
+```

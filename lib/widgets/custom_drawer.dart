@@ -4,6 +4,8 @@ import '../screens/content_screen.dart';
 import '../screens/feedback_screen.dart';
 import '../screens/dashboard_screen.dart';
 import '../login/user_session.dart';
+import '../screens/login_screen.dart';
+import '../theme/app_theme.dart';
 
 class CustomDrawer extends StatelessWidget {
   final String channelName;
@@ -85,7 +87,7 @@ class CustomDrawer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return NavigationDrawer(
-      backgroundColor: Colors.black,
+      backgroundColor: AppTheme.darkSurfaceColor,
       selectedIndex: selectedIndex,
       onDestinationSelected: (index) => _navigateToPage(context, index),
       children: [
@@ -106,7 +108,7 @@ class CustomDrawer extends StatelessWidget {
                     Text(
                       channelName,
                       style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                            color: Colors.white,
+                            color: AppTheme.surfaceColor,
                             fontWeight: FontWeight.bold,
                           ),
                     ),
@@ -114,7 +116,7 @@ class CustomDrawer extends StatelessWidget {
                     Text(
                       channelDescription,
                       style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                            color: Colors.white70,
+                            color: AppTheme.disabledColor,
                           ),
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
@@ -125,48 +127,83 @@ class CustomDrawer extends StatelessWidget {
             ],
           ),
         ),
-        const Padding(
-          padding: EdgeInsets.symmetric(horizontal: 28, vertical: 10),
-          child: Divider(color: Colors.white24),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 10),
+          child: Divider(color: AppTheme.disabledColor.withOpacity(0.3)),
         ),
-        const NavigationDrawerDestination(
-          icon: Icon(Icons.dashboard_outlined, color: Colors.white),
-          selectedIcon: Icon(Icons.dashboard, color: Colors.white),
+        NavigationDrawerDestination(
+          icon: Icon(Icons.dashboard_outlined, color: AppTheme.surfaceColor),
+          selectedIcon: Icon(Icons.dashboard, color: AppTheme.accentColor),
           label: Padding(
-            padding: EdgeInsets.only(left: 8),
+            padding: const EdgeInsets.only(left: 8),
             child: Text(
               'Dashboard',
               style: TextStyle(
-                color: Colors.white,
+                color: AppTheme.surfaceColor,
                 fontSize: 16,
               ),
             ),
           ),
         ),
-        const NavigationDrawerDestination(
-          icon: Icon(Icons.video_library_outlined, color: Colors.white),
-          selectedIcon: Icon(Icons.video_library, color: Colors.white),
+        NavigationDrawerDestination(
+          icon: Icon(Icons.video_library_outlined, color: AppTheme.surfaceColor),
+          selectedIcon: Icon(Icons.video_library, color: AppTheme.accentColor),
           label: Padding(
-            padding: EdgeInsets.only(left: 8),
+            padding: const EdgeInsets.only(left: 8),
             child: Text(
               'Content',
               style: TextStyle(
-                color: Colors.white,
+                color: AppTheme.surfaceColor,
                 fontSize: 16,
               ),
             ),
           ),
         ),
-        const NavigationDrawerDestination(
-          icon: Icon(Icons.feedback_outlined, color: Colors.white),
-          selectedIcon: Icon(Icons.feedback, color: Colors.white),
+        NavigationDrawerDestination(
+          icon: Icon(Icons.feedback_outlined, color: AppTheme.surfaceColor),
+          selectedIcon: Icon(Icons.feedback, color: AppTheme.accentColor),
           label: Padding(
-            padding: EdgeInsets.only(left: 8),
+            padding: const EdgeInsets.only(left: 8),
             child: Text(
               'Feedback',
               style: TextStyle(
-                color: Colors.white,
+                color: AppTheme.surfaceColor,
                 fontSize: 16,
+              ),
+            ),
+          ),
+        ),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 10),
+          child: Divider(color: AppTheme.disabledColor.withOpacity(0.3)),
+        ),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          child: InkWell(
+            onTap: () {
+              // Clear user session
+              UserSession().clearSession();
+              
+              // Navigate to login screen
+              Navigator.of(context).pushAndRemoveUntil(
+                MaterialPageRoute(builder: (context) => const LoginScreen()),
+                (route) => false, // Remove all previous routes
+              );
+            },
+            child: Padding(
+              padding: const EdgeInsets.all(12.0),
+              child: Row(
+                children: [
+                  Icon(Icons.logout, color: AppTheme.surfaceColor),
+                  const SizedBox(width: 16),
+                  Text(
+                    'Logout',
+                    style: TextStyle(
+                      color: AppTheme.surfaceColor,
+                      fontSize: 16,
+                    ),
+                  ),
+                ],
               ),
             ),
           ),

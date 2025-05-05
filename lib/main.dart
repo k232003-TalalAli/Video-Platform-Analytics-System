@@ -8,9 +8,14 @@ void main() async {
 
   if (Platform.isWindows || Platform.isLinux || Platform.isMacOS) {
     setWindowTitle('Login');
-    setWindowMinSize(const Size(500, 600));
-    setWindowMaxSize(const Size(500, 750));
-    setWindowFrame(const Rect.fromLTWH(100, 100, 500, 650));
+    setWindowMaxSize(Size.infinite); // Allow window to be maximized to any size
+    setWindowMinSize(const Size(800, 600)); // Optional: Set a minimum size
+    getCurrentScreen().then((screen) {
+      if (screen != null) {
+        final screenFrame = screen.visibleFrame;
+        setWindowFrame(screenFrame); // Maximize the window to screen size
+      }
+    });
   }
 
   runApp(const YouTubeStudio());

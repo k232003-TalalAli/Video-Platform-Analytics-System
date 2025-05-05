@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'profile_picture.dart';
+import '../theme/app_theme.dart';
 
 class ProfileSettingsDialog extends StatefulWidget {
   final String initialName;
@@ -74,7 +75,7 @@ class _ProfileSettingsDialogState extends State<ProfileSettingsDialog> {
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(16),
       ),
-      backgroundColor: Colors.white,
+      backgroundColor: AppTheme.surfaceColor,
       child: Container(
         padding: const EdgeInsets.all(24),
         constraints: const BoxConstraints(maxWidth: 400),
@@ -97,15 +98,15 @@ class _ProfileSettingsDialogState extends State<ProfileSettingsDialog> {
                     height: 28,
                     width: 28,
                     decoration: BoxDecoration(
-                      color: Colors.black87,
+                      color: AppTheme.primaryColor,
                       shape: BoxShape.circle,
-                      border: Border.all(color: Colors.white, width: 1.5),
+                      border: Border.all(color: AppTheme.surfaceColor, width: 1.5),
                     ),
                     child: PopupMenuButton<String>(
                       padding: EdgeInsets.zero,
-                      icon: const Icon(
+                      icon: Icon(
                         Icons.edit,
-                        color: Colors.white,
+                        color: AppTheme.surfaceColor,
                         size: 16,
                       ),
                       onSelected: (value) async {
@@ -122,23 +123,23 @@ class _ProfileSettingsDialogState extends State<ProfileSettingsDialog> {
                         }
                       },
                       itemBuilder: (context) => [
-                        const PopupMenuItem(
+                        PopupMenuItem(
                           value: 'change',
                           child: Row(
                             children: [
-                              Icon(Icons.photo_camera),
-                              SizedBox(width: 8),
-                              Text('Change Photo'),
+                              Icon(Icons.photo_camera, color: AppTheme.primaryColor),
+                              const SizedBox(width: 8),
+                              const Text('Change Photo'),
                             ],
                           ),
                         ),
-                        const PopupMenuItem(
+                        PopupMenuItem(
                           value: 'remove',
                           child: Row(
                             children: [
-                              Icon(Icons.delete),
-                              SizedBox(width: 8),
-                              Text('Remove Photo'),
+                              Icon(Icons.delete, color: AppTheme.accentColor),
+                              const SizedBox(width: 8),
+                              const Text('Remove Photo'),
                             ],
                           ),
                         ),
@@ -151,24 +152,24 @@ class _ProfileSettingsDialogState extends State<ProfileSettingsDialog> {
             const SizedBox(height: 24),
             TextField(
               controller: _nameController,
-              decoration: const InputDecoration(
+              decoration: InputDecoration(
                 labelText: 'Channel Name',
-                labelStyle: TextStyle(color: Colors.black54),
+                labelStyle: TextStyle(color: AppTheme.secondaryTextColor),
                 border: OutlineInputBorder(),
                 focusedBorder: OutlineInputBorder(
-                  borderSide: BorderSide(color: Colors.black, width: 2),
+                  borderSide: BorderSide(color: AppTheme.primaryColor, width: 2),
                 ),
               ),
             ),
             const SizedBox(height: 16),
             TextField(
               controller: _descriptionController,
-              decoration: const InputDecoration(
+              decoration: InputDecoration(
                 labelText: 'Channel Description',
-                labelStyle: TextStyle(color: Colors.black54),
+                labelStyle: TextStyle(color: AppTheme.secondaryTextColor),
                 border: OutlineInputBorder(),
                 focusedBorder: OutlineInputBorder(
-                  borderSide: BorderSide(color: Colors.black, width: 2),
+                  borderSide: BorderSide(color: AppTheme.primaryColor, width: 2),
                 ),
               ),
               maxLines: 3,
@@ -186,7 +187,7 @@ class _ProfileSettingsDialogState extends State<ProfileSettingsDialog> {
                     Navigator.pop(context);
                   },
                   style: TextButton.styleFrom(
-                    foregroundColor: Colors.black54,
+                    foregroundColor: AppTheme.secondaryTextColor,
                   ),
                   child: const Text('Cancel'),
                 ),
@@ -199,8 +200,8 @@ class _ProfileSettingsDialogState extends State<ProfileSettingsDialog> {
                     );
                   },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.black,
-                    foregroundColor: Colors.white,
+                    backgroundColor: AppTheme.primaryColor,
+                    foregroundColor: AppTheme.surfaceColor,
                   ),
                   child: const Text('Save'),
                 ),

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../theme/app_theme.dart';
 
 class AnalyticsCard extends StatelessWidget {
   final String title;
@@ -15,7 +16,7 @@ class AnalyticsCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Card(
-      color: const Color.fromARGB(255, 241, 241, 241),
+      color: AppTheme.darkSurfaceColor,
       child: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
@@ -26,15 +27,15 @@ class AnalyticsCard extends StatelessWidget {
                 Icon(
                   icon,
                   size: 20,
-                  color: Colors.black,
+                  color: AppTheme.surfaceColor,
                 ),
                 const SizedBox(width: 4),
                 Expanded(
                   child: Text(
                     title,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 14,
-                      color: Colors.black54,
+                      color: AppTheme.disabledColor,
                       fontWeight: FontWeight.w500,
                     ),
                     overflow: TextOverflow.ellipsis,
@@ -48,10 +49,10 @@ class AnalyticsCard extends StatelessWidget {
               alignment: Alignment.centerLeft,
               child: Text(
                 value,
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 28,
                   fontWeight: FontWeight.bold,
-                  color: Colors.black,
+                  color: AppTheme.surfaceColor,
                 ),
               ),
             ),

@@ -61,6 +61,11 @@ class Userdata {
       throw Exception("User not found for ID: $userId");
     }
   }
+  
+  // Method to reset the singleton state
+  void reset() {
+    _isInitialized = false;
+  }
 }
 
 Future<void> setupSession(String userId) async {

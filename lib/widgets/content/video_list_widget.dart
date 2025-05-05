@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:intl/intl.dart';
 import '../dashboard/line_graph.dart';
 import '../../DB/controllers/database_helper.dart';
+import '../../theme/app_theme.dart'; // Import the theme
 
 // Keep the utility functions
 List<String> Get_dates_onwards(String startDateStr) {
@@ -61,7 +62,6 @@ Widget videoStatisticsGraphsWithDates(BuildContext context, String videoId,
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.black, width: 2),
         boxShadow: const [
           BoxShadow(
             color: Color.fromRGBO(128, 128, 128, 0.2),
@@ -370,7 +370,7 @@ class _VideoListWidgetState extends State<VideoListWidget> {
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
               decoration: BoxDecoration(
                 color: isSelected
-                    ? Colors.black
+                    ? AppTheme.darkSurfaceColor
                     : (isHovering ? Colors.grey.shade100 : Colors.white),
                 borderRadius: BorderRadius.circular(24),
                 border: Border.all(
@@ -392,13 +392,13 @@ class _VideoListWidgetState extends State<VideoListWidget> {
                   Icon(
                     icon,
                     size: 18,
-                    color: isSelected ? Colors.white : Colors.grey.shade700,
+                    color: isSelected ? AppTheme.surfaceColor : Colors.grey.shade700,
                   ),
                   const SizedBox(width: 6),
                   Text(
                     text,
                     style: TextStyle(
-                      color: isSelected ? Colors.white : Colors.grey.shade700,
+                      color: isSelected ? AppTheme.surfaceColor : Colors.grey.shade700,
                       fontWeight: isHovering || isSelected
                           ? FontWeight.w600
                           : FontWeight.w500,
@@ -473,7 +473,7 @@ class _VideoListWidgetState extends State<VideoListWidget> {
                     duration: const Duration(milliseconds: 150),
                     padding: const EdgeInsets.all(10),
                     decoration: BoxDecoration(
-                      color: isHovering ? Colors.grey.shade100 : Colors.white,
+                      color: AppTheme.darkSurfaceColor,
                       shape: BoxShape.circle,
                       border: Border.all(
                           color: isHovering
@@ -492,7 +492,7 @@ class _VideoListWidgetState extends State<VideoListWidget> {
                     child: Icon(
                       ascending ? Icons.arrow_upward : Icons.arrow_downward,
                       size: 20,
-                      color: Colors.black,
+                      color: AppTheme.surfaceColor,
                     ),
                   ),
                 ),

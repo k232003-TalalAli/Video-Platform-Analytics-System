@@ -2,6 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'profile_settings_dialog.dart';
 import 'profile_picture.dart';
+import '../login/user_session.dart';
+import '../DB/repositories/user_repository.dart';
+import '../DB/models/user.dart';
+import '../screens/dashboard_screen.dart';
+import '../theme/app_theme.dart';
 
 class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   final String channelName;
@@ -26,7 +31,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(16),
         ),
-        backgroundColor: Colors.white,
+        backgroundColor: AppTheme.surfaceColor,
         child: Container(
           padding: const EdgeInsets.all(24),
           constraints: const BoxConstraints(maxWidth: 400),
@@ -37,16 +42,16 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Text(
+                  Text(
                     'Channel Description',
                     style: TextStyle(
                       fontSize: 20,
                       fontWeight: FontWeight.bold,
-                      color: Colors.black,
+                      color: AppTheme.primaryTextColor,
                     ),
                   ),
                   IconButton(
-                    icon: const Icon(Icons.close, color: Colors.black54),
+                    icon: Icon(Icons.close, color: AppTheme.secondaryTextColor),
                     onPressed: () => Navigator.pop(context),
                   ),
                 ],
@@ -54,18 +59,18 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
               const SizedBox(height: 16),
               Text(
                 channelName,
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.w500,
-                  color: Colors.black,
+                  color: AppTheme.primaryTextColor,
                 ),
               ),
               const SizedBox(height: 8),
               Text(
                 channelDescription,
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 14,
-                  color: Colors.black87,
+                  color: AppTheme.secondaryTextColor,
                 ),
               ),
               const SizedBox(height: 24),
@@ -73,17 +78,9 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
                   TextButton(
-                    onPressed: () => _showProfileSettings(context),
-                    style: TextButton.styleFrom(
-                      foregroundColor: Colors.black,
-                    ),
-                    child: const Text('Edit Profile'),
-                  ),
-                  const SizedBox(width: 8),
-                  TextButton(
                     onPressed: () => Navigator.pop(context),
                     style: TextButton.styleFrom(
-                      foregroundColor: Colors.black54,
+                      foregroundColor: AppTheme.primaryColor,
                     ),
                     child: const Text('Close'),
                   ),
@@ -135,11 +132,54 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
 
     // Only update if save was pressed (result is true)
     if (result == true && context.mounted) {
-      onProfileUpdate(
-        tempName,
-        tempDescription,
-        tempImageUrl,
-      );
+      try {
+        // Get current user ID
+        final userId = UserSession().currentUserId;
+        if (userId != null) {
+          // Get the user repository
+          final userRepository = UserRepository();
+          
+          // Get current user data
+          final currentUser = await userRepository.getUserById(userId);
+          
+          if (currentUser != null) {
+            // Create updated user object
+            final updatedUser = User(
+              userId: currentUser.userId,
+              userName: currentUser.userName,
+              channelCreationDate: currentUser.channelCreationDate,
+              channelName: tempName,
+              totalViews: currentUser.totalViews,
+              totalSubs: currentUser.totalSubs,
+              totalComments: currentUser.totalComments,
+              totalWatchtime: currentUser.totalWatchtime,
+              totalRevenue: currentUser.totalRevenue,
+              channelImageLink: tempImageUrl,
+              description: tempDescription,
+            );
+            
+            // Save to database
+            await userRepository.updateUser(updatedUser);
+            
+            // Update Userdata singleton for in-memory state
+            Userdata userData = Userdata();
+            userData.channelName = tempName;
+            userData.description = tempDescription;
+            userData.channelImageLink = tempImageUrl;
+            
+            // Update UI through callback
+            onProfileUpdate(
+              tempName,
+              tempDescription,
+              tempImageUrl,
+            );
+            
+            print('Profile updated and saved to database successfully');
+          }
+        }
+      } catch (e) {
+        print('Error updating user profile: $e');
+      }
     }
   }
 
@@ -174,6 +214,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
       ],
     );
   }
+
 
   @override
   Size get preferredSize => const Size.fromHeight(kToolbarHeight);
