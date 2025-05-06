@@ -154,7 +154,7 @@ def generate_random_video_title():
         "Beginner's Guide to", "Advanced Techniques for",
         "I Spent a Week", "24 Hours of", "Behind the Scenes of",
         "Review of", "First Look at", "Honest Opinion on",
-        "The Best and Worst of"
+        "The Best and Worst of", "Black", "Hamara"
     ]
     
     topics = [
@@ -164,7 +164,7 @@ def generate_random_video_title():
         "Woodworking", "Gardening", "Interior Design", "Martial Arts",
         "Drawing", "Animation", "Writing", "Public Speaking", "Productivity",
         "AI Tools", "Mobile Apps", "Social Media", "Digital Marketing",
-        "Web Development", "Graphic Design", "Video Editing"
+        "Web Development", "Graphic Design", "Video Editing", "Man", "Watan"
     ]
     
     suffixes = [
@@ -174,7 +174,7 @@ def generate_random_video_title():
         "- You Won't Believe What Happened", "| My Honest Experience",
         "vs Traditional Methods", "Challenge Results", "Experiment",
         "on a Budget", "Like a Pro", "in Just One Week", "Secrets Revealed",
-        "That Nobody Talks About", "- Is It Worth It?"
+        "That Nobody Talks About", "- Is It Worth It?", "Steal", "Hamara"
     ]
     
     return f"{random.choice(prefixes)} {random.choice(topics)} {random.choice(suffixes)}"
