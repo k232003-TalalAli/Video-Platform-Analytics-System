@@ -154,7 +154,7 @@ def generate_random_video_title():
         "Beginner's Guide to", "Advanced Techniques for",
         "I Spent a Week", "24 Hours of", "Behind the Scenes of",
         "Review of", "First Look at", "Honest Opinion on",
-        "The Best and Worst of", "Black", "Hamara"
+        "The Best and Worst of", "Black", "Yay"
     ]
     
     topics = [
