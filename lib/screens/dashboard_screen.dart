@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import '../widgets/profile_picture.dart';
 import '../widgets/dashboard/analytics_card.dart';
-import '../widgets/dashboard/overview_graphs.dart';
+import '../widgets/dashboard/overview_widget.dart';
 import '../widgets/custom_app_bar.dart';
 import '../widgets/custom_drawer.dart';
 import '../login/user_session.dart';
@@ -9,9 +9,16 @@ import '../../DB/API/db_api.dart';
 import 'package:intl/intl.dart';
 
 String _formatWatchTime(int seconds) {
-    int hours = seconds ~/ 3600;
+  int hours = seconds ~/ 3600;
+
+  if (hours >= 1000000) {
+    return '${(hours / 1000000).toStringAsFixed(1)}M hrs';
+  } else if (hours >= 1000) {
+    return '${(hours / 1000).toStringAsFixed(1)}K hrs';
+  } else {
     return '$hours hrs';
   }
+}
 
 final numberFormatter = NumberFormat.compact();
 
@@ -254,7 +261,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
     Expanded(
       child: AnalyticsCard(
         title: 'Revenue',
-        value: '\$${_totalRevenue.toStringAsFixed(2)}',
+        value: '\$ ${numberFormatter.format(_totalRevenue)}',
         icon: Icons.attach_money,
       ),
     ),

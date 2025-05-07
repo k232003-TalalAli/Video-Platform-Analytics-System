@@ -304,8 +304,16 @@ List<String> Get_dates_onwards(String startDateStr) {
 
 String _formatWatchTime(int seconds) {
   int hours = seconds ~/ 3600;
-  return '$hours hrs';
+
+  if (hours >= 1000000) {
+    return '${(hours / 1000000).toStringAsFixed(1)}M hrs';
+  } else if (hours >= 1000) {
+    return '${(hours / 1000).toStringAsFixed(1)}K hrs';
+  } else {
+    return '$hours hrs';
+  }
 }
+
 
 Widget overview_graphs(BuildContext context, String CreationDate) {
   int totalDays = 30;

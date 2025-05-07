@@ -1,6 +1,6 @@
 import '../DB/controllers/database_helper.dart';
 import '../screens/dashboard_screen.dart';
-import '../widgets/dashboard/overview_graphs.dart';
+import '../widgets/dashboard/overview_widget.dart';
 import '../DB/API/Widget_database_utility.dart';
 
 /// A class to manage user session information across the app

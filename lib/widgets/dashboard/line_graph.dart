@@ -72,8 +72,10 @@ Widget buildLineChart(
                 backgroundColor: Color.fromARGB(255, 255, 255, 255),
                 clipData: const FlClipData.all(),
                 titlesData: FlTitlesData(
-                  topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
-                  rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                  topTitles: const AxisTitles(
+                      sideTitles: SideTitles(showTitles: false)),
+                  rightTitles: const AxisTitles(
+                      sideTitles: SideTitles(showTitles: false)),
                   bottomTitles: AxisTitles(
                     sideTitles: SideTitles(
                       showTitles: true,
@@ -81,12 +83,14 @@ Widget buildLineChart(
                       interval: 1,
                       getTitlesWidget: (value, meta) {
                         int index = value.round();
-                        if (labelIndexes.contains(index) && index < dates.length) {
+                        if (labelIndexes.contains(index) &&
+                            index < dates.length) {
                           return SideTitleWidget(
                             axisSide: meta.axisSide,
                             space: 8,
                             child: Padding(
-                              padding: const EdgeInsets.symmetric(horizontal: 12), // <- Added padding
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 12), // <- Added padding
                               child: SizedBox(
                                 width: 60,
                                 child: Text(
@@ -109,10 +113,20 @@ Widget buildLineChart(
                       reservedSize: 40,
                       interval: yInterval,
                       getTitlesWidget: (value, meta) {
+                        String formatNumber(double num) {
+                          if (num >= 1000000000)
+                            return '${(num / 1000000000).toStringAsFixed(1)}B';
+                          if (num >= 1000000)
+                            return '${(num / 1000000).toStringAsFixed(1)}M';
+                          if (num >= 1000)
+                            return '${(num / 1000).toStringAsFixed(1)}K';
+                          return num.toStringAsFixed(0);
+                        }
+
                         return Padding(
                           padding: const EdgeInsets.only(right: 4),
                           child: Text(
-                            '${value.toInt()}',
+                            formatNumber(value),
                             style: const TextStyle(fontSize: 10),
                           ),
                         );

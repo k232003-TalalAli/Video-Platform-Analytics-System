@@ -21,6 +21,18 @@ List<String> Get_dates_onwards(String startDateStr) {
   return sequentialDates;
 }
 
+String _formatWatchTime(int seconds) {
+  int hours = seconds ~/ 3600;
+
+  if (hours >= 1000000) {
+    return '${(hours / 1000000).toStringAsFixed(1)}M hrs';
+  } else if (hours >= 1000) {
+    return '${(hours / 1000).toStringAsFixed(1)}K hrs';
+  } else {
+    return '$hours hrs';
+  }
+}
+
 // Fixed function to properly use database metrics and avoid random data generation
 Widget videoStatisticsGraphsWithDates(BuildContext context, String videoId,
     Map<String, List<DayMetric>> videoMetricsMap) {
@@ -342,11 +354,6 @@ class _VideoListWidgetState extends State<VideoListWidget> {
     return number.toString();
   }
 
-  String _formatWatchTime(int seconds) {
-    int hours = seconds ~/ 3600;
-    return '$hours hrs';
-  }
-
   Widget _buildSortButton(SortCriteria criteria, String text, IconData icon) {
     final bool isSelected = currentSortCriteria == criteria;
 
@@ -656,7 +663,7 @@ class _VideoListWidgetState extends State<VideoListWidget> {
                                   size: 16, color: Colors.grey[600]),
                               const SizedBox(width: 6),
                               Text(
-                                '\$${video.revenue.toStringAsFixed(2)}',
+                                 _formatNumber(video.revenue.toInt()),
                                 style: TextStyle(
                                   fontSize: dateFontSize,
                                   color: Colors.grey[600],

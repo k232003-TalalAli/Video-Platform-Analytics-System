@@ -3,7 +3,7 @@ import 'dart:math';
 import 'package:intl/intl.dart';
 import '../dashboard/analytics_card.dart';
 import '../dashboard/line_graph.dart';
-import '../dashboard/overview_graphs.dart';
+import '../dashboard/overview_widget.dart';
 import '../../../DB/API/Widget_database_utility.dart';
 
 List<String> Get_dates_onwards(String startDateStr) {
@@ -25,7 +25,7 @@ Widget overview_graphs(BuildContext context, String CreationDate, int video_inde
   List<String> dates = Get_dates_onwards(CreationDate);
 
   double chartHeight = MediaQuery.of(context).size.height > 600 ? 300 : 200;
-  double chartWidth = MediaQuery.of(context).size.width * 0.4; // adjust as needed
+  double chartWidth = MediaQuery.of(context).size.width * 0.3; // adjust as needed
 
   return Container(
     padding: const EdgeInsets.symmetric(vertical: 25.0),
@@ -105,10 +105,17 @@ class _VideoListWidgetState extends State<VideoListWidget> {
     return number.toString();
   }
 
-  String _formatWatchTime(int seconds) {
-    int hours = seconds ~/ 3600;
-    return '$hours hrs';
+String _formatWatchTime(int seconds) {
+  int hours = seconds ~/ 3600;
+
+  if (hours >= 1000000) {
+    return '${(hours / 1000000).toStringAsFixed(1)}M hrs';
+  } else if (hours >= 1000) {
+    return '${(hours / 1000).toStringAsFixed(1)}K hrs';
+  } else {
+    return '$hours hours';
   }
+}
 
   @override
   Widget build(BuildContext context) {
@@ -307,9 +314,9 @@ class _VideoListWidgetState extends State<VideoListWidget> {
                                         ),
                                         _infoItem(
                                           Icons.attach_money,
-                                          Videos()
+                                          _formatNumber(Videos()
                                               .videoList[i]
-                                              .revenue
+                                              .revenue.toInt())
                                               .toString(),
                                           dateFontSize,
                                         ),
