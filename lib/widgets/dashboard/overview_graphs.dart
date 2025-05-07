@@ -41,6 +41,10 @@ class Videos {
       throw Exception("No videos found for user ID: $userId");
     }
   }
+  
+  void reset() {
+    _isInitialized = false;
+  }
 }
 
 // Updated TopVideosWidget with dynamic parameters
@@ -118,7 +122,7 @@ class _TopVideosWidgetState extends State<TopVideosWidget> {
     double nameFontSize = screenWidth > 600 ? 20 : 16;
     double dateFontSize = screenWidth > 600 ? 16 : 12;
 
-    const baseColor = Color.fromARGB(255, 241, 241, 241);
+    const baseColor = Color.fromARGB(255, 195, 214, 241);
     final hoverColor = baseColor.withOpacity(0.94);
 
     if (!Videos()._isInitialized) {

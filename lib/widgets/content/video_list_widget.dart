@@ -60,7 +60,7 @@ Widget videoStatisticsGraphsWithDates(BuildContext context, String videoId,
     padding: const EdgeInsets.all(16.0),
     child: Container(
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Color.fromARGB(255, 195, 214, 241),
         borderRadius: BorderRadius.circular(16),
         boxShadow: const [
           BoxShadow(
@@ -370,12 +370,12 @@ class _VideoListWidgetState extends State<VideoListWidget> {
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
               decoration: BoxDecoration(
                 color: isSelected
-                    ? AppTheme.darkSurfaceColor
-                    : (isHovering ? Colors.grey.shade100 : Colors.white),
+                    ? Color.fromARGB(255, 42, 76, 134)
+                    : (isHovering ? Color.fromARGB(255, 195, 214, 241) : Colors.white),
                 borderRadius: BorderRadius.circular(24),
                 border: Border.all(
                     color: isHovering
-                        ? Colors.grey.shade400
+                        ? Color.fromARGB(255, 42, 76, 134)
                         : Colors.grey.shade300),
                 boxShadow: [
                   BoxShadow(
@@ -392,13 +392,13 @@ class _VideoListWidgetState extends State<VideoListWidget> {
                   Icon(
                     icon,
                     size: 18,
-                    color: isSelected ? AppTheme.surfaceColor : Colors.grey.shade700,
+                    color: isSelected ? Colors.white : Color.fromARGB(255, 42, 76, 134),
                   ),
                   const SizedBox(width: 6),
                   Text(
                     text,
                     style: TextStyle(
-                      color: isSelected ? AppTheme.surfaceColor : Colors.grey.shade700,
+                      color: isSelected ? Colors.white : Color.fromARGB(255, 42, 76, 134),
                       fontWeight: isHovering || isSelected
                           ? FontWeight.w600
                           : FontWeight.w500,
@@ -473,7 +473,7 @@ class _VideoListWidgetState extends State<VideoListWidget> {
                     duration: const Duration(milliseconds: 150),
                     padding: const EdgeInsets.all(10),
                     decoration: BoxDecoration(
-                      color: AppTheme.darkSurfaceColor,
+                      color: Color.fromARGB(255, 42, 76, 134),
                       shape: BoxShape.circle,
                       border: Border.all(
                           color: isHovering
@@ -492,7 +492,7 @@ class _VideoListWidgetState extends State<VideoListWidget> {
                     child: Icon(
                       ascending ? Icons.arrow_upward : Icons.arrow_downward,
                       size: 20,
-                      color: AppTheme.surfaceColor,
+                      color: Colors.white,
                     ),
                   ),
                 ),
@@ -709,7 +709,7 @@ class _VideoListWidgetState extends State<VideoListWidget> {
         return Container(
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: Color.fromARGB(255, 195, 214, 241),
             borderRadius: BorderRadius.circular(16),
             border:
                 Border.all(color: const Color.fromRGBO(0, 0, 0, 0.1), width: 1),

@@ -51,6 +51,7 @@ class _ContentScreenState extends State<ContentScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       key: _scaffoldKey,
+      backgroundColor: const Color.fromARGB(255, 219, 238, 255),
       appBar: CustomAppBar(
         channelName: _channelName,
         channelDescription: _channelDescription,

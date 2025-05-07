@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'dart:io'; // For checking platform
 import 'package:window_size/window_size.dart';
 import 'screens/login_screen.dart';
+import 'theme/app_theme.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -39,7 +40,7 @@ class YouTubeStudio extends StatelessWidget {
           onSurface: Colors.black,
         ),
         appBarTheme: const AppBarTheme(
-          backgroundColor: Colors.black,
+          backgroundColor: AppTheme.primaryColor,
           foregroundColor: Colors.white,
           elevation: 0,
           toolbarHeight: 72,
@@ -66,7 +67,7 @@ class YouTubeStudio extends StatelessWidget {
         navigationDrawerTheme: const NavigationDrawerThemeData(
           backgroundColor: Colors.white,
           elevation: 1,
-          indicatorColor: Colors.black,
+          indicatorColor: Color.fromARGB(255, 42, 76, 134),
         ),
         floatingActionButtonTheme: const FloatingActionButtonThemeData(
           backgroundColor: Colors.black,

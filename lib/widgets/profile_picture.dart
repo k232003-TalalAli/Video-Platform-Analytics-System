@@ -6,12 +6,14 @@ class ProfilePicture extends StatelessWidget {
   final String? imageUrl;
   final double size;
   final String? channelName;
+  final Color? backgroundColor;
 
   const ProfilePicture({
     super.key,
     this.imageUrl,
     this.size = 120,
     this.channelName,
+    this.backgroundColor,
   });
 
   @override
@@ -58,7 +60,7 @@ class ProfilePicture extends StatelessWidget {
   Widget _buildDefaultAvatar() {
     if (channelName != null && channelName!.isNotEmpty) {
       return Container(
-        color: AppTheme.darkSurfaceColor,
+        color: backgroundColor ?? AppTheme.primaryColor,
         child: Center(
           child: Text(
             channelName![0].toUpperCase(),
@@ -72,7 +74,7 @@ class ProfilePicture extends StatelessWidget {
       );
     }
     return Container(
-      color: AppTheme.darkSurfaceColor,
+      color: backgroundColor ?? AppTheme.darkSurfaceColor,
       child: Icon(
         Icons.person,
         size: size * 0.6,

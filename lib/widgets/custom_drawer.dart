@@ -87,7 +87,7 @@ class CustomDrawer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return NavigationDrawer(
-      backgroundColor: AppTheme.darkSurfaceColor,
+      backgroundColor: AppTheme.primaryColor,
       selectedIndex: selectedIndex,
       onDestinationSelected: (index) => _navigateToPage(context, index),
       children: [
@@ -99,6 +99,7 @@ class CustomDrawer extends StatelessWidget {
                 imageUrl: profileImageUrl,
                 size: 56,
                 channelName: channelName,
+                backgroundColor: const Color.fromARGB(255, 42, 76, 134),
               ),
               const SizedBox(width: 16),
               Expanded(

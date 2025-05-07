@@ -1,5 +1,6 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
+import '../../theme/app_theme.dart';
 
 Widget buildLineChart(
   int totalDays,
@@ -33,7 +34,7 @@ Widget buildLineChart(
     width: double.infinity,
     padding: const EdgeInsets.fromLTRB(12, 12, 35, 12),
     decoration: const BoxDecoration(
-      color: Color.fromARGB(255, 241, 241, 241),
+      color: Color.fromARGB(255, 255, 255, 255),
       borderRadius: BorderRadius.all(Radius.circular(12)),
       border: Border(
         bottom: BorderSide(color: Colors.grey, width: 1.5),
@@ -68,7 +69,7 @@ Widget buildLineChart(
                 maxX: totalDays.toDouble() - 1,
                 minY: 0,
                 maxY: maxY + yInterval,
-                backgroundColor: Colors.white,
+                backgroundColor: Color.fromARGB(255, 255, 255, 255),
                 clipData: const FlClipData.all(),
                 titlesData: FlTitlesData(
                   topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),

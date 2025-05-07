@@ -28,6 +28,13 @@ class Metrics {
 
   /// Access video i's data on day j: metrics.video[i][j]
   List<List<VideoMetric>> get video => videoMetrics;
+
+  /// Method to reset the singleton state
+  void reset() {
+    for (int i = 0; i < videoMetrics.length; i++) {
+      videoMetrics[i].clear();
+    }
+  }
 }
 
 List<int> sumDailyViews() {

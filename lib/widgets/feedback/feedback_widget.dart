@@ -32,7 +32,7 @@ Widget overview_graphs(BuildContext context, String CreationDate, int video_inde
     decoration: BoxDecoration(
       border: Border.all(color: Colors.black87, width: 2),
       borderRadius: BorderRadius.circular(12),
-      color: Color.fromARGB(255, 175, 215, 255),
+      color: Color.fromARGB(255, 195, 214, 241),
     ),
     child: Row(
       mainAxisAlignment: MainAxisAlignment.center, // Center graphs horizontally
@@ -382,9 +382,8 @@ class _VideoListWidgetState extends State<VideoListWidget> {
           child: Container(
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: baseColor,
+              color: Color.fromARGB(255, 195, 214, 241),
               borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: Colors.brown.shade300, width: 2),
             ),
             child: SingleChildScrollView(
               child: Column(

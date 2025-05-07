@@ -9,6 +9,7 @@ class AnalyticsCard extends StatelessWidget {
   const AnalyticsCard({
     super.key,
     required this.title,
+    
     required this.value,
     required this.icon,
   });
@@ -16,7 +17,7 @@ class AnalyticsCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Card(
-      color: AppTheme.darkSurfaceColor,
+      color:  AppTheme.primaryColor,
       child: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
@@ -35,7 +36,7 @@ class AnalyticsCard extends StatelessWidget {
                     title,
                     style: TextStyle(
                       fontSize: 14,
-                      color: AppTheme.disabledColor,
+                      color: AppTheme.surfaceColor,
                       fontWeight: FontWeight.w500,
                     ),
                     overflow: TextOverflow.ellipsis,

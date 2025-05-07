@@ -147,6 +147,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
     return Scaffold(
       key: _scaffoldKey,
+      backgroundColor: const Color.fromARGB(255, 219, 238, 255),
       drawerEdgeDragWidth: 0,
       appBar: CustomAppBar(
         channelName: _channelName,

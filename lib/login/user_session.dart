@@ -1,5 +1,7 @@
 import '../DB/controllers/database_helper.dart';
 import '../screens/dashboard_screen.dart';
+import '../widgets/dashboard/overview_graphs.dart';
+import '../DB/API/Widget_database_utility.dart';
 
 /// A class to manage user session information across the app
 class UserSession {
@@ -28,8 +30,10 @@ class UserSession {
     _currentUserId = null;
     _currentUsername = null;
     
-    // Reset the Userdata singleton
+    // Reset all singleton instances
     Userdata().reset();
+    Videos().reset();
+    Metrics().reset();
   }
   
   /// Get user ID from username
