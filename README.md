@@ -1,6 +1,6 @@
-# YouTube Studio Clone
+# Video Analytics System (VAS)
 
-A Flutter application that replicates the core functionality of YouTube Studio, allowing content creators to manage their YouTube channel, videos, and analytics.
+A Flutter application that attempts to replicates the core functionality of YouTube Studio, allowing content creators to manage their YouTube channel, videos, and analytics.
 
 ## Features
 
@@ -22,12 +22,12 @@ A Flutter application that replicates the core functionality of YouTube Studio, 
 
 1. Clone the repository:
 ```bash
-git clone https://github.com/yourusername/utube.git
+git clone https://github.com/k232003-TalalAli/Video-Platform-Analytics-System.git
 ```
 
 2. Navigate to the project directory:
 ```bash
-cd utube
+cd Video-Platform-Analytics-System
 ```
 
 3. Install dependencies:
@@ -43,15 +43,64 @@ flutter run
 ## Project Structure
 
 ```
-lib/
-  ├── main.dart
-  ├── screens/
-  │   └── dashboard_screen.dart
-  ├── widgets/
-  │   ├── video_card.dart
-  │   └── analytics_card.dart
-  └── models/
-      └── video_model.dart
+VAS/
+├── Documentation/
+│   ├── Video_Platform_Analytics_System_SDS.pdf
+│   └── Video_Platform_Analytics_System_SRS.pdf
+├── imgs/
+│   ├── thumbnail_1.jpg
+│   ├── thumbnail_2.jpg
+│   ├── thumbnail_3.jpg
+│   └── thumbnail_4.jpg
+├── lib/
+│   ├── DB/
+│   │   ├── API/
+│   │   │   ├── db_api.dart
+│   │   │   └── Widget_database_utility.dart
+│   │   ├── controllers/
+│   │   │   └── database_helper.dart
+│   │   ├── models/
+│   │   │   ├── user.dart
+│   │   │   ├── video_metric.dart
+│   │   │   ├── video.dart
+│   │   │   └── video_metric.dart
+│   │   ├── repositories/
+│   │   │   ├── user_repository.dart
+│   │   │   ├── video_metric_repository.dart
+│   │   │   └── video_repository.dart
+│   │   ├── tests/
+│   │   └── youtube_analytics.db
+│   ├── login/
+│   │   ├── login_database_helper.dart
+│   │   ├── login_users.db
+│   │   └── user_session.dart
+│   ├── screens/
+│   │   ├── content_screen.dart
+│   │   ├── dashboard_screen.dart
+│   │   ├── feedback_screen.dart
+│   │   └── login_screen.dart
+│   ├── theme/
+│   │   └── app_theme.dart
+│   ├── widgets/
+│   │   ├── content/
+│   │   │   └── video_list_widget.dart
+│   │   ├── dashboard/
+│   │   │   ├── analytics_card.dart
+│   │   │   ├── line_graph.dart
+│   │   │   └── overview_widget.dart
+│   │   ├── feedback/
+│   │   │   └── feedback_widget.dart
+│   │   ├── custom_app_bar.dart
+│   │   ├── custom_drawer.dart
+│   │   ├── profile_picture.dart
+│   │   └── profile_settings_dialog.dart
+│   └── main.dart
+├── .gitignore
+├── analysis_operations.yaml
+├── generate_dummy_data.py
+├── graphs.py
+├── pubspec.yaml
+└── README.md
 ```
 
 ## Dependencies
