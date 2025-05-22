@@ -89,7 +89,7 @@ List<String> imgPaths = [
   "imgs/thumbnail_2.jpg",
   "imgs/thumbnail_3.jpg",
   "imgs/thumbnail_4.jpg",
-  "imgs/thumbnail_3.jpg",
+  "imgs/thumbnail_5.jpg",
 ];
 
 class _VideoListWidgetState extends State<VideoListWidget> {

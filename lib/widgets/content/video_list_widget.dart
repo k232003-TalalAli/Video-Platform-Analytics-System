@@ -201,6 +201,15 @@ class _VideoListWidgetState extends State<VideoListWidget> {
     }
   }
 
+  final List<String> thumbnailPaths = [
+  "imgs/thumbnail_1.jpg",
+  "imgs/thumbnail_2.jpg",
+  "imgs/thumbnail_3.jpg",
+  "imgs/thumbnail_4.jpg",
+  "imgs/thumbnail_5.jpg",
+];
+
+
   Future<void> _loadVideos(String userId) async {
     try {
       final userVideos = await DatabaseHelper.instance.getUserVideos(userId);
@@ -272,7 +281,7 @@ class _VideoListWidgetState extends State<VideoListWidget> {
           comments: video['comments'] as int,
           watchtime: video['watchtime'] as int,
           creationDate: video['creation_date'] as String,
-          thumbnailPath: "imgs/thumbnail_${Random().nextInt(4) + 1}.jpg",
+          thumbnailPath: thumbnailPaths[loadedVideos.length % thumbnailPaths.length],
         ));
       }
 

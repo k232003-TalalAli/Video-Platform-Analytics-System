@@ -57,7 +57,7 @@ class YouTubeStudio extends StatelessWidget {
             fontWeight: FontWeight.w500,
           ),
         ),
-        cardTheme: CardTheme(
+        cardTheme: CardThemeData(
           color: Colors.white,
           elevation: 2,
           shape: RoundedRectangleBorder(

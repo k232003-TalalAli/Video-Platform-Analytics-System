@@ -60,7 +60,7 @@ class AppTheme {
           color: surfaceColor,
         ),
       ),
-      cardTheme: CardTheme(
+      cardTheme: CardThemeData(
         color: surfaceColor,
         elevation: 2,
         shape: RoundedRectangleBorder(
@@ -120,7 +120,7 @@ class AppTheme {
         waitDuration: Duration(milliseconds: 500),
       ),
       // Dialog theme
-      dialogTheme: DialogTheme(
+      dialogTheme: DialogThemeData(
         backgroundColor: surfaceColor,
         elevation: 5,
         shape: RoundedRectangleBorder(
