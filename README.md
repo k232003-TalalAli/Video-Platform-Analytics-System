@@ -40,6 +40,10 @@ flutter pub get
 flutter run
 ```
 
+## Login Credentials
+Usernames: "umer", "Danny", "Talal", "Nemo", "Lelouch"
+Password: Umer@12g
+
 ## Project Structure
 
 ```
