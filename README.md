@@ -59,8 +59,11 @@ Password: Umer@12g
 ### Content 2  
 ![Content2](imgs/content2.png)
 
-### Feedback  
-![Feedback](imgs/feedback.png)
+### Feedback 1 
+![Feedback](imgs/feedback1.png)
+
+### Feedback 2 
+![Feedback](imgs/feedback2.png)
 
 ### Profile  
 ![Profile](imgs/profile.png)

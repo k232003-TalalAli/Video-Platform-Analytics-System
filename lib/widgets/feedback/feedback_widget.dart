@@ -233,7 +233,7 @@ String _formatWatchTime(int seconds) {
                     margin: EdgeInsets.symmetric(vertical: spacing / 2),
                     padding: videoPadding,
                     decoration: BoxDecoration(
-                      color: Color.fromARGB(255, 211, 233, 255),
+                      color: Color.fromARGB(255, 255, 255, 255),
                       border: Border.all(color: Colors.black, width: 2),
                       borderRadius: BorderRadius.circular(borderRadius),
                       boxShadow: [

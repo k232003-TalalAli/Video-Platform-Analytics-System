@@ -53,7 +53,7 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       key: _scaffoldKey,
-      backgroundColor: const Color.fromARGB(255, 195, 214, 241),
+      backgroundColor: const Color.fromARGB(255, 219, 238, 255),
       appBar: CustomAppBar(
         channelName: _channelName,
         channelDescription: _channelDescription,
