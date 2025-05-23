@@ -43,6 +43,7 @@ flutter run
 ### Login Credentials
 
 Usernames: "umer", "Danny", "Talal", "Nemo", "Lelouch" 
+
 Password: Umer@12g
 
 ## Screenshots
@@ -91,7 +92,6 @@ VAS/
 │   │   │   └── database_helper.dart
 │   │   ├── models/
 │   │   │   ├── user.dart
-│   │   │   ├── video_metric.dart
 │   │   │   ├── video.dart
 │   │   │   └── video_metric.dart
 │   │   ├── repositories/
