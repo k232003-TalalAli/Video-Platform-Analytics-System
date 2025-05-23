@@ -80,10 +80,8 @@ VAS/
 │   ├── Video_Platform_Analytics_System_SDS.pdf
 │   └── Video_Platform_Analytics_System_SRS.pdf
 ├── imgs/
-│   ├── thumbnail_1.jpg
-│   ├── thumbnail_2.jpg
-│   ├── thumbnail_3.jpg
-│   └── thumbnail_4.jpg
+│   ├── thumbnails.jpgs
+│   ├── screenshots.pngs
 ├── lib/
 │   ├── DB/
 │   │   ├── API/
